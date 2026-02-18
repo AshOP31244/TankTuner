@@ -8,6 +8,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
 
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
+allowed = os.environ.get('ALLOWED_HOSTS', '')
 ALLOWED_HOSTS = [h.strip() for h in allowed.split(',') if h.strip()] + ['.railway.app', 'localhost', '127.0.0.1']
 
 INSTALLED_APPS = [
