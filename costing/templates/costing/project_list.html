@@ -1,0 +1,553 @@
+{% extends 'costing/base.html' %}
+
+{% block title %}Project List{% endblock %}
+
+{% block extra_css %}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f6f7f8;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-bottom: 1px solid rgba(51, 152, 219, 0.1);
+            padding: 24px 0;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .header .container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            padding: 0 24px;
+        }
+
+        @media (min-width: 768px) {
+            .header .container {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0 32px;
+            }
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-content h1 {
+            color: #2c3e50;
+            font-size: 28px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-content .material-icons {
+            color: #3398db;
+            font-size: 32px;
+        }
+
+        .header-content p {
+            color: rgba(51, 152, 219, 0.8);
+            font-size: 13px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #3398db;
+            color: white;
+            box-shadow: 0 2px 8px rgba(51, 152, 219, 0.2);
+        }
+
+        .btn-primary:hover {
+            background: #2d87c4;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(51, 152, 219, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #3398db;
+            border: 1px solid rgba(51, 152, 219, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(51, 152, 219, 0.05);
+            border-color: #3398db;
+        }
+
+        /* User profile */
+        .user-profile {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(51, 152, 219, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(51, 152, 219, 0.2);
+        }
+
+        .user-profile .material-icons {
+            color: #3398db;
+            font-size: 20px;
+        }
+
+        /* Main content */
+        main {
+            padding: 32px 24px;
+        }
+
+        @media (min-width: 768px) {
+            main {
+                padding: 40px 32px;
+            }
+        }
+
+        /* Projects Grid */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+
+        /* Project Card */
+        .project-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid rgba(51, 152, 219, 0.05);
+            overflow: hidden;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .project-card:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+            border-color: rgba(51, 152, 219, 0.2);
+        }
+
+        .card-content {
+            padding: 24px;
+            flex: 1;
+        }
+
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .project-title-section h2 {
+            color: #2c3e50;
+            font-size: 20px;
+            font-weight: 700;
+            line-height: 1.3;
+            margin-bottom: 4px;
+        }
+
+        .project-client {
+            color: #6b7280;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .project-client .material-icons {
+            font-size: 14px;
+        }
+
+        .project-status {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 9999px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        /* Stats Container */
+        .project-stats {
+            background: rgba(51, 152, 219, 0.05);
+            border: 1px solid rgba(51, 152, 219, 0.1);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 20px 0;
+        }
+
+        .stats-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: rgba(51, 152, 219, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            display: block;
+            font-size: 18px;
+            font-weight: 700;
+            color: #2c3e50;
+            line-height: 1.2;
+        }
+
+        .stat-value.savings {
+            color: #3398db;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        /* Project Description */
+        .project-description {
+            color: #4b5563;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .project-date {
+            color: #9ca3af;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+
+        /* Card Actions - NOW 4 BUTTONS */
+        .project-actions {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            border-top: 1px solid rgba(51, 152, 219, 0.05);
+            background: #f9fafb;
+        }
+
+        .project-actions a {
+            padding: 16px 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            text-decoration: none;
+            color: #6b7280;
+            transition: all 0.2s;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .project-actions a:hover {
+            background: #3398db;
+            color: white;
+        }
+
+        .project-actions a:hover .material-icons {
+            transform: scale(1.1);
+        }
+
+        .project-actions a .material-icons {
+            font-size: 20px;
+            transition: transform 0.2s;
+        }
+
+        .project-actions a span:last-child {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            background: white;
+            border-radius: 12px;
+            padding: 60px 40px;
+            text-align: center;
+            border: 2px dashed rgba(51, 152, 219, 0.2);
+            background: rgba(255, 255, 255, 0.3);
+            margin-top: 32px;
+        }
+
+        .empty-state-icon {
+            width: 64px;
+            height: 64px;
+            background: rgba(51, 152, 219, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            transition: all 0.3s;
+        }
+
+        .empty-state-icon .material-icons {
+            font-size: 32px;
+            color: #3398db;
+        }
+
+        .empty-state:hover .empty-state-icon {
+            background: #3398db;
+        }
+
+        .empty-state:hover .empty-state-icon .material-icons {
+            color: white;
+        }
+
+        .empty-state h2 {
+            color: #2c3e50;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 24px;
+            max-width: 300px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header .container {
+                padding: 0 16px;
+            }
+            
+            main {
+                padding: 24px 16px;
+            }
+            
+            .project-actions {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .project-actions a {
+                border-bottom: 1px solid rgba(51, 152, 219, 0.05);
+            }
+            
+            .project-actions a:nth-child(2n) {
+                border-left: 1px solid rgba(51, 152, 219, 0.05);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .stats-grid {
+                gap: 4px;
+            }
+            
+            .stat-value {
+                font-size: 16px;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<body>
+    <!-- Header -->
+    {% comment %} <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1>
+                    <span class="material-icons">precision_manufacturing</span>
+                    TankTuner
+                </h1>
+                <p>Professional Tank Costing Management System</p>
+            </div>
+            <div class="header-actions">
+                <a href="{% url 'analytics_dashboard' %}" class="btn btn-secondary">
+                    <span class="material-icons" style="font-size: 18px;">insights</span>
+                    Global Analytics
+                </a>
+                <a href="{% url 'project_create' %}" class="btn btn-primary">
+                    <span class="material-icons" style="font-size: 18px;">add</span>
+                    New Project
+                </a>
+                <div class="user-profile">
+                    <span class="material-icons">account_circle</span>
+                </div>
+            </div>
+        </div>
+    </header> {% endcomment %}
+
+    <main>
+        <div class="container">
+            <!-- Projects Grid -->
+            {% if projects %}
+            <div class="projects-grid">
+                {% for project in projects %}
+                <div class="project-card">
+                    <div class="card-content">
+                        <div class="project-header">
+                            <div class="project-title-section">
+                                <h2 class="project-title">{{ project.name }}</h2>
+                                {% if project.client_name and project.client_name != 'N/A' %}
+                                <div class="project-client">
+                                    <span class="material-icons">business</span>
+                                    {{ project.client_name }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <span class="project-status status-active">Active</span>
+                        </div>
+
+                        <div class="project-date">
+                            Created {{ project.created_at|date:"M d, Y" }}
+                        </div>
+
+                        {% if project.description %}
+                        <p class="project-description">{{ project.description }}</p>
+                        {% else %}
+                        <p class="project-description" style="color: #9ca3af; font-style: italic;">
+                            No description provided
+                        </p>
+                        {% endif %}
+
+                        <div class="project-stats">
+                            <div class="stats-label">Project Stats</div>
+                            <div class="stats-grid">
+                                <div class="stat">
+                                    <span class="stat-value">{{ project.total_models }}</span>
+                                    <span class="stat-label">Models</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-value">{{ project.total_sheets }}</span>
+                                    <span class="stat-label">Sheets</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-value savings">₹{{ project.total_savings|floatformat:0 }}</span>
+                                    <span class="stat-label">Saved</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="project-actions">
+                        <a href="{% url 'project_detail' project.id %}">
+                            <span class="material-icons">folder_open</span>
+                            <span>Open</span>
+                        </a>
+                        <a href="{% url 'project_tuner' project.id %}">
+                            <span class="material-icons">tune</span>
+                            <span>Tuner</span>
+                        </a>
+                        <a href="{% url 'project_analytics' project.id %}">
+                            <span class="material-icons">insights</span>
+                            <span>Analytics</span>
+                        </a>
+                        <a href="{% url 'project_snapshots' project.id %}">
+                            <span class="material-icons">history</span>
+                            <span>Snapshots</span>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+
+                <!-- Create New Project Card -->
+                <div class="empty-state" onclick="window.location.href='{% url 'project_create' %}'" style="cursor: pointer;">
+                    <div class="empty-state-icon">
+                        <span class="material-icons">add</span>
+                    </div>
+                    <h2>Create New Project</h2>
+                    <p>Start a new optimization project</p>
+                </div>
+            </div>
+            {% else %}
+            <!-- Empty State -->
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <span class="material-icons">inventory_2</span>
+                </div>
+                <h2>No Projects Yet</h2>
+                <p>Create your first project to start managing tank costing</p>
+                <a href="{% url 'project_create' %}" class="btn btn-primary">
+                    <span class="material-icons" style="font-size: 18px;">add</span>
+                    Create Your First Project
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+{% endblock %}
+</html>

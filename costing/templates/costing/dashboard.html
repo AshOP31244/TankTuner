@@ -1,0 +1,1678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TankTuner - Cost Optimizer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* CSS Variables & Reset */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+            --success-gradient: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            --danger-gradient: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+            --warning-gradient: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+            
+            --primary-color: #667eea;
+            --secondary-color: #718096;
+            --success-color: #48bb78;
+            --danger-color: #f56565;
+            --warning-color: #ed8936;
+            
+            --bg-primary: #ffffff;
+            --bg-secondary: #f7fafc;
+            --bg-tertiary: #edf2f7;
+            
+            --text-primary: #2d3748;
+            --text-secondary: #4a5568;
+            --text-muted: #718096;
+            
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 30px rgba(0,0,0,0.1);
+            --shadow-xl: 0 20px 40px rgba(0,0,0,0.15);
+            
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+            
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            
+            --font-size-xs: 12px;
+            --font-size-sm: 14px;
+            --font-size-base: 16px;
+            --font-size-lg: 18px;
+            --font-size-xl: 20px;
+            --font-size-2xl: 24px;
+            --font-size-3xl: 32px;
+            
+            --font-weight-normal: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 600;
+            --font-weight-bold: 700;
+            
+            --transition-fast: 150ms ease;
+            --transition-base: 250ms ease;
+            --transition-slow: 350ms ease;
+        }
+
+        /* Reset & Base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--primary-gradient);
+            min-height: 100vh;
+            padding: var(--spacing-lg);
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        /* Utility Classes */
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: var(--bg-primary);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-xl);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .flex-col {
+            flex-direction: column;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        .gap-sm { gap: var(--spacing-sm); }
+        .gap-md { gap: var(--spacing-md); }
+        .gap-lg { gap: var(--spacing-lg); }
+        .gap-xl { gap: var(--spacing-xl); }
+
+        .text-center { text-align: center; }
+        .text-muted { color: var(--text-muted); }
+
+        .w-full { width: 100%; }
+        .hidden { display: none !important; }
+        .visible { display: block; }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md) var(--spacing-lg);
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-semibold);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--bg-primary);
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn-success {
+            background: var(--success-gradient);
+            color: white;
+        }
+
+        .btn-info {
+            background: var(--secondary-gradient);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: var(--spacing-sm) var(--spacing-md);
+            font-size: var(--font-size-xs);
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: var(--spacing-lg);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .brand-icon {
+            font-size: var(--font-size-2xl);
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .brand-title {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--text-primary);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: var(--spacing-md);
+            flex-wrap: wrap;
+        }
+
+        /* Selection Panel */
+        .selection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+
+        .form-label {
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-select {
+            padding: var(--spacing-md);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: var(--font-size-base);
+            color: var(--text-primary);
+            background: var(--bg-primary);
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-select:disabled {
+            background: var(--bg-secondary);
+            cursor: not-allowed;
+        }
+
+        /* Main Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        @media (max-width: 1024px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Materials Panel */
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-lg);
+            padding-bottom: var(--spacing-md);
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .panel-title {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-bold);
+            color: var(--text-primary);
+        }
+
+        .panel-icon {
+            color: var(--primary-color);
+        }
+
+        .cost-badge {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-bold);
+            color: var(--primary-color);
+            background: var(--bg-secondary);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--radius-md);
+        }
+
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+        }
+
+        .materials-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: var(--font-size-sm);
+        }
+
+        .materials-table thead {
+            background: var(--bg-secondary);
+        }
+
+        .materials-table th {
+            padding: var(--spacing-md);
+            text-align: left;
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-size: var(--font-size-xs);
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .materials-table td {
+            padding: var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .materials-table tbody tr {
+            transition: background-color var(--transition-fast);
+        }
+
+        .materials-table tbody tr:hover {
+            background: var(--bg-secondary);
+        }
+
+        .material-name {
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-primary);
+        }
+
+        .cost-cell {
+            font-weight: var(--font-weight-semibold);
+            color: var(--primary-color);
+        }
+
+        /* Tuner Panel */
+        .tuner-panel {
+            opacity: 0;
+            transform: translateX(10px);
+            transition: all var(--transition-base);
+        }
+
+        .tuner-panel.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .tuner-header {
+            margin-bottom: var(--spacing-lg);
+            padding-bottom: var(--spacing-md);
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .tuner-material-name {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-bold);
+            color: var(--text-primary);
+        }
+
+        .input-group {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .input-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-sm);
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-secondary);
+            font-size: var(--font-size-sm);
+        }
+
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-weight: var(--font-weight-normal);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: var(--spacing-md);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-medium);
+            color: var(--text-primary);
+            transition: all var(--transition-base);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-input:disabled {
+            background: var(--bg-secondary);
+            cursor: not-allowed;
+        }
+
+        .cost-display {
+            background: var(--primary-gradient);
+            color: white;
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-lg);
+            text-align: center;
+            margin: var(--spacing-lg) 0;
+        }
+
+        .cost-label {
+            font-size: var(--font-size-xs);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.9;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .cost-value {
+            font-size: var(--font-size-3xl);
+            font-weight: var(--font-weight-bold);
+        }
+
+        /* Comparison Panel */
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-lg);
+            margin-top: var(--spacing-lg);
+        }
+
+        .comparison-card {
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-lg);
+            text-align: center;
+            transition: transform var(--transition-base);
+        }
+
+        .comparison-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .card-before {
+            background: linear-gradient(135deg, #edf2f7 0%, #e2e8f0 100%);
+        }
+
+        .card-after {
+            background: linear-gradient(135deg, #e6fffa 0%, #b2f5ea 100%);
+        }
+
+        .card-difference {
+            background: linear-gradient(135deg, #fed7d7 0%, #feb2b2 100%);
+        }
+
+        .card-savings {
+            background: linear-gradient(135deg, #c6f6d5 0%, #9ae6b4 100%);
+        }
+
+        .comparison-label {
+            font-size: var(--font-size-xs);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .comparison-value {
+            font-size: var(--font-size-2xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--text-primary);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: var(--spacing-xl) var(--spacing-lg);
+            color: var(--text-muted);
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: var(--spacing-md);
+            opacity: 0.3;
+        }
+
+        .empty-state-title {
+            font-size: var(--font-size-xl);
+            margin-bottom: var(--spacing-sm);
+            color: var(--text-secondary);
+        }
+
+        /* Loading States */
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-top: 2px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Saved Snapshots Styles */
+        .snapshot-item {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .snapshot-item:hover {
+            background: #edf2f7;
+            transform: translateX(5px);
+        }
+
+        .snapshot-info {
+            flex: 1;
+        }
+
+        .snapshot-label {
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 15px;
+            margin-bottom: 5px;
+        }
+
+        .snapshot-meta {
+            font-size: 13px;
+            color: #718096;
+        }
+
+        .snapshot-cost {
+            font-size: 18px;
+            font-weight: 700;
+            color: #667eea;
+            margin: 0 20px;
+        }
+
+        .snapshot-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .badge-original {
+            background: #e6fffa;
+            color: #0f766e;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-adjusted {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .save-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .save-modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .save-modal h3 {
+            color: #2d3748;
+            margin-bottom: 20px;
+        }
+
+        .save-modal textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .save-modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .save-modal-actions button {
+            flex: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: var(--spacing-md);
+            }
+            
+            .header-content {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .header-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .selection-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .snapshot-item {
+                flex-direction: column;
+                align-items: stretch;
+                gap: var(--spacing-md);
+            }
+            
+            .snapshot-cost {
+                margin: 0;
+                text-align: center;
+            }
+            
+            .snapshot-actions {
+                justify-content: center;
+            }
+        }
+
+        /* Animation Classes */
+        .fade-in {
+            animation: fadeIn var(--transition-base);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .slide-up {
+            animation: slideUp var(--transition-base);
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="card">
+                <div class="header-content">
+                    <div class="brand">
+                        <div class="brand-icon">🔧</div>
+                        <h1 class="brand-title">TankTuner - Cost Optimizer</h1>
+                    </div>
+                    <div class="header-actions">
+                        <a href="/upload/" class="btn btn-secondary">
+                            <i class="fas fa-upload"></i> Upload New Sheet
+                        </a>
+                        <button id="exportModelBtn" class="btn btn-success" disabled>
+                            <i class="fas fa-download"></i> Export Model CSV
+                        </button>
+                        <button id="exportComparisonBtn" class="btn btn-info" disabled>
+                            <i class="fas fa-chart-bar"></i> Export Comparison
+                        </button>
+                        <!-- ✅ ADDED SAVE BUTTON -->
+                        <button id="saveSnapshotBtn" class="btn btn-success" disabled>
+                            <i class="fas fa-save"></i> Save Current State
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Selection Panel -->
+        <section class="selection-panel">
+            <div class="card">
+                <div class="selection-grid">
+                    <div class="form-group">
+                        <label class="form-label">Product Type</label>
+                        <select id="productSelect" class="form-select" disabled>
+                            <option value="">Loading products...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Tank Model</label>
+                        <select id="modelSelect" class="form-select" disabled>
+                            <option value="">Select product first</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ✅ ADDED SAVED SNAPSHOTS PANEL -->
+        <section class="saved-snapshots-section" id="savedSnapshotsPanel" style="display: none;">
+            <div class="card">
+                <div class="panel-header">
+                    <h2 class="panel-title">
+                        <span class="panel-icon">💾</span>
+                        Saved Snapshots
+                    </h2>
+                    <button onclick="refreshSavedSnapshots()" class="btn btn-sm btn-secondary">
+                        <i class="fas fa-redo"></i> Refresh
+                    </button>
+                </div>
+                
+                <div id="snapshotsContainer">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">💾</div>
+                        <h3 class="empty-state-title">No Saved Snapshots</h3>
+                        <p class="text-muted">Make some adjustments and click "Save Current State" to save snapshots</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Content -->
+        <main class="content-grid">
+            <!-- Materials Table -->
+            <section class="materials-section">
+                <div class="card">
+                    <div class="panel-header">
+                        <h2 class="panel-title">
+                            <span class="panel-icon">📋</span>
+                            Material Breakdown
+                        </h2>
+                        <div id="finalCost" class="cost-badge">₹ 0.00</div>
+                    </div>
+                    
+                    <div id="materialsTableContainer" class="fade-in">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📦</div>
+                            <h3 class="empty-state-title">No Model Selected</h3>
+                            <p class="text-muted">Select a product and model to view material breakdown</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tuner Panel -->
+            <aside class="tuner-section">
+                <div id="tunerPanel" class="card tuner-panel">
+                    <div class="tuner-header">
+                        <h3 id="tunerMaterialName" class="tuner-material-name">Select Material</h3>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            <span>Quantity</span>
+                            <span class="toggle-group">
+                                <input type="checkbox" id="lockQtyToggle">
+                                <span>Lock</span>
+                            </span>
+                        </label>
+                        <input type="number" id="quantityInput" class="form-input" step="any" min="0" disabled>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            <span>Rate (₹)</span>
+                            <span class="toggle-group">
+                                <input type="checkbox" id="lockRateToggle">
+                                <span>Lock</span>
+                            </span>
+                        </label>
+                        <input type="number" id="rateInput" class="form-input" step="any" min="0" disabled>
+                    </div>
+
+                    <div class="cost-display slide-up">
+                        <div class="cost-label">Material Cost</div>
+                        <div class="cost-value">₹ <span id="tunerTotalCost">0.00</span></div>
+                    </div>
+
+                    <button id="resetButton" class="btn btn-secondary w-full" disabled>
+                        <i class="fas fa-redo"></i> Reset to Original
+                    </button>
+                </div>
+            </aside>
+        </main>
+
+        <!-- Comparison Panel -->
+        <section id="comparisonPanel" class="comparison-panel hidden">
+            <div class="card">
+                <div class="panel-header">
+                    <h2 class="panel-title">
+                        <span class="panel-icon">💰</span>
+                        Cost Comparison
+                    </h2>
+                </div>
+
+                <div class="comparison-grid">
+                    <div class="comparison-card card-before">
+                        <div class="comparison-label">Original Cost</div>
+                        <div class="comparison-value">₹ <span id="originalCost">0.00</span></div>
+                    </div>
+
+                    <div class="comparison-card card-after">
+                        <div class="comparison-label">Optimized Cost</div>
+                        <div class="comparison-value">₹ <span id="optimizedCost">0.00</span></div>
+                    </div>
+
+                    <div class="comparison-card card-difference" id="differenceCard">
+                        <div class="comparison-label" id="differenceLabel">Difference</div>
+                        <div class="comparison-value">₹ <span id="costDifference">0.00</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Save Modal -->
+    <div id="saveModal" class="save-modal hidden">
+        <div class="save-modal-content">
+            <h3>💾 Save Current State</h3>
+            <textarea id="snapshotNotes" placeholder="Add optional notes about this snapshot..."></textarea>
+            <div class="save-modal-actions">
+                <button onclick="hideSaveModal()" class="btn btn-secondary">Cancel</button>
+                <button onclick="saveSnapshot()" class="btn btn-success">Save Snapshot</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Application State
+        const AppState = {
+            lockQuantity: false,
+            lockRate: false,
+            materials: [],
+            originalMaterials: [],
+            selectedMaterialIndex: null,
+            currentProduct: '',
+            currentModel: '',
+            isLoading: false,
+            originalSaved: false // Track if original has been saved
+        };
+
+        // DOM Elements
+        const DOM = {
+            // Selectors
+            productSelect: document.getElementById('productSelect'),
+            modelSelect: document.getElementById('modelSelect'),
+            
+            // Tuner Elements
+            tunerPanel: document.getElementById('tunerPanel'),
+            tunerMaterialName: document.getElementById('tunerMaterialName'),
+            quantityInput: document.getElementById('quantityInput'),
+            rateInput: document.getElementById('rateInput'),
+            lockQtyToggle: document.getElementById('lockQtyToggle'),
+            lockRateToggle: document.getElementById('lockRateToggle'),
+            tunerTotalCost: document.getElementById('tunerTotalCost'),
+            resetButton: document.getElementById('resetButton'),
+            
+            // Table & Display
+            materialsTableContainer: document.getElementById('materialsTableContainer'),
+            finalCost: document.getElementById('finalCost'),
+            
+            // Comparison Elements
+            comparisonPanel: document.getElementById('comparisonPanel'),
+            originalCost: document.getElementById('originalCost'),
+            optimizedCost: document.getElementById('optimizedCost'),
+            costDifference: document.getElementById('costDifference'),
+            differenceCard: document.getElementById('differenceCard'),
+            differenceLabel: document.getElementById('differenceLabel'),
+            
+            // Action Buttons
+            exportModelBtn: document.getElementById('exportModelBtn'),
+            exportComparisonBtn: document.getElementById('exportComparisonBtn'),
+            saveSnapshotBtn: document.getElementById('saveSnapshotBtn'),
+            
+            // Snapshots Elements
+            savedSnapshotsPanel: document.getElementById('savedSnapshotsPanel'),
+            snapshotsContainer: document.getElementById('snapshotsContainer'),
+            
+            // Modal Elements
+            saveModal: document.getElementById('saveModal'),
+            snapshotNotes: document.getElementById('snapshotNotes')
+        };
+
+        // Utility Functions
+        const Utils = {
+            formatCurrency(value) {
+                return parseFloat(value).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            },
+
+            calculateTotalCost(materials) {
+                return materials.reduce((sum, material) => sum + material.total, 0);
+            },
+
+            debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            },
+
+            getCSRFToken() {
+                const name = 'csrftoken';
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            },
+
+            showAlert(message, type = 'info') {
+                alert(message);
+            }
+        };
+
+        // API Service
+        const APIService = {
+            async fetchProducts() {
+                try {
+                    const response = await fetch('/get-products/');
+                    if (!response.ok) throw new Error('Failed to fetch products');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error fetching products:', error);
+                    throw error;
+                }
+            },
+
+            async fetchModels(product) {
+                try {
+                    const response = await fetch(`/get-models/?product=${encodeURIComponent(product)}`);
+                    if (!response.ok) throw new Error('Failed to fetch models');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error fetching models:', error);
+                    throw error;
+                }
+            },
+
+            async fetchModelData(product, model) {
+                try {
+                    const response = await fetch(
+                        `/get-model-data/?product=${encodeURIComponent(product)}&model=${encodeURIComponent(model)}`
+                    );
+                    if (!response.ok) throw new Error('Failed to fetch model data');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error fetching model data:', error);
+                    throw error;
+                }
+            },
+
+            async exportModelCSV(data) {
+                try {
+                    const response = await fetch('/export/model/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': Utils.getCSRFToken()
+                        },
+                        body: JSON.stringify(data)
+                    });
+                    if (!response.ok) throw new Error('Export failed');
+                    return await response.blob();
+                } catch (error) {
+                    console.error('Error exporting model:', error);
+                    throw error;
+                }
+            },
+
+            async exportComparisonCSV(data) {
+                try {
+                    const response = await fetch('/export/comparison/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': Utils.getCSRFToken()
+                        },
+                        body: JSON.stringify(data)
+                    });
+                    if (!response.ok) throw new Error('Export failed');
+                    return await response.blob();
+                } catch (error) {
+                    console.error('Error exporting comparison:', error);
+                    throw error;
+                }
+            },
+
+            // New API methods for snapshots
+            async saveOriginalToDatabase(data) {
+                try {
+                    const response = await fetch("/api/save-original/", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": Utils.getCSRFToken()
+                        },
+                        body: JSON.stringify(data)
+                    });
+                    if (!response.ok) throw new Error('Failed to save original');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error saving original:', error);
+                    throw error;
+                }
+            },
+
+            async fetchSavedSnapshots(product, model) {
+                try {
+                    const response = await fetch(`/api/get-saved-models/?product=${encodeURIComponent(product)}&model=${encodeURIComponent(model)}`);
+                    if (!response.ok) throw new Error('Failed to fetch snapshots');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error loading snapshots:', error);
+                    throw error;
+                }
+            },
+
+            async saveSnapshot(data) {
+                try {
+                    const response = await fetch("/api/save-snapshot/", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": Utils.getCSRFToken()
+                        },
+                        body: JSON.stringify(data)
+                    });
+                    if (!response.ok) throw new Error('Failed to save snapshot');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error saving snapshot:', error);
+                    throw error;
+                }
+            },
+
+            async loadSnapshot(snapshotId) {
+                try {
+                    const response = await fetch(`/api/load-snapshot/${snapshotId}/`);
+                    if (!response.ok) throw new Error('Failed to load snapshot');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error loading snapshot:', error);
+                    throw error;
+                }
+            },
+
+            async deleteSnapshot(snapshotId) {
+                try {
+                    const response = await fetch(`/api/delete-snapshot/${snapshotId}/`, {
+                        method: "POST",
+                        headers: {
+                            'X-CSRFToken': Utils.getCSRFToken()
+                        }
+                    });
+                    if (!response.ok) throw new Error('Failed to delete snapshot');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error deleting snapshot:', error);
+                    throw error;
+                }
+            }
+        };
+
+        // UI Renderer
+        const UIRenderer = {
+            renderMaterialsTable(materials) {
+                if (!materials || materials.length === 0) {
+                    DOM.materialsTableContainer.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📦</div>
+                            <h3 class="empty-state-title">No Materials Found</h3>
+                            <p class="text-muted">No materials data available for this model</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const totalCost = Utils.calculateTotalCost(materials);
+                DOM.finalCost.textContent = `₹ ${Utils.formatCurrency(totalCost)}`;
+
+                const tableHTML = `
+                    <div class="table-container">
+                        <table class="materials-table">
+                            <thead>
+                                <tr>
+                                    <th>Material</th>
+                                    <th>Quantity</th>
+                                    <th>Unit</th>
+                                    <th>Rate (₹)</th>
+                                    <th>Total (₹)</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${materials.map((material, index) => `
+                                    <tr>
+                                        <td class="material-name">${material.name}</td>
+                                        <td>${material.quantity.toFixed(2)}</td>
+                                        <td>${material.unit}</td>
+                                        <td>₹ ${material.rate.toFixed(2)}</td>
+                                        <td class="cost-cell">₹ ${material.total.toFixed(2)}</td>
+                                        <td>
+                                            <button onclick="AppController.selectMaterial(${index})" 
+                                                    class="btn btn-primary btn-sm">
+                                                <i class="fas fa-sliders-h"></i> Adjust
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+
+                DOM.materialsTableContainer.innerHTML = tableHTML;
+            },
+
+            updateComparison(originalMaterials, currentMaterials) {
+                const originalTotal = Utils.calculateTotalCost(originalMaterials);
+                const currentTotal = Utils.calculateTotalCost(currentMaterials);
+                const difference = currentTotal - originalTotal;
+                const isSavings = difference <= 0;
+
+                DOM.originalCost.textContent = Utils.formatCurrency(originalTotal);
+                DOM.optimizedCost.textContent = Utils.formatCurrency(currentTotal);
+                DOM.costDifference.textContent = Utils.formatCurrency(Math.abs(difference));
+
+                if (isSavings) {
+                    DOM.differenceCard.className = 'comparison-card card-savings';
+                    DOM.differenceLabel.innerHTML = '<i class="fas fa-check-circle"></i> Savings';
+                } else {
+                    DOM.differenceCard.className = 'comparison-card card-difference';
+                    DOM.differenceLabel.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Increase';
+                }
+
+                DOM.comparisonPanel.classList.remove('hidden');
+            },
+
+            updateTunerPanel(material) {
+                if (!material) {
+                    DOM.tunerPanel.classList.remove('active');
+                    return;
+                }
+
+                DOM.tunerMaterialName.textContent = material.name;
+                DOM.quantityInput.value = material.quantity;
+                DOM.rateInput.value = material.rate;
+                DOM.tunerTotalCost.textContent = Utils.formatCurrency(material.total);
+
+                DOM.quantityInput.disabled = AppState.lockQuantity;
+                DOM.rateInput.disabled = AppState.lockRate;
+
+                DOM.tunerPanel.classList.add('active');
+                DOM.resetButton.disabled = false;
+            },
+
+            setLoading(state) {
+                AppState.isLoading = state;
+                document.body.classList.toggle('loading', state);
+            },
+
+            showError(message) {
+                alert(`Error: ${message}`);
+            },
+
+            // New method for rendering saved snapshots
+            renderSavedSnapshots(snapshots) {
+                if (!snapshots || snapshots.length === 0) {
+                    DOM.snapshotsContainer.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">💾</div>
+                            <h3 class="empty-state-title">No Saved Snapshots</h3>
+                            <p class="text-muted">Make some adjustments and click "Save Current State" to save snapshots</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = '';
+                
+                snapshots.forEach(snap => {
+                    let badgeClass = snap.is_original ? 'badge-original' : 'badge-adjusted';
+                    let badgeText = snap.is_original ? 'Original' : 'Adjusted';
+                    
+                    html += `
+                        <div class="snapshot-item">
+                            <div class="snapshot-info">
+                                <div class="snapshot-label">
+                                    <span class="${badgeClass}">${badgeText}</span>
+                                    ${snap.saved_at}
+                                </div>
+                                ${snap.notes ? `<div class="snapshot-meta">${snap.notes}</div>` : ''}
+                            </div>
+                            <div class="snapshot-cost">₹ ${snap.final_cost.toFixed(2)}</div>
+                            <div class="snapshot-actions">
+                                <button onclick="AppController.loadSnapshotData(${snap.id})" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-folder-open"></i> Load
+                                </button>
+                                ${!snap.is_original ? `
+                                    <button onclick="AppController.deleteSnapshot(${snap.id})" class="btn btn-sm" style="background: var(--danger-gradient); color: white;">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                DOM.snapshotsContainer.innerHTML = html;
+            },
+
+            showSaveModal() {
+                DOM.snapshotNotes.value = '';
+                DOM.saveModal.classList.remove('hidden');
+            },
+
+            hideSaveModal() {
+                DOM.saveModal.classList.add('hidden');
+            }
+        };
+
+        // Application Controller
+        const AppController = {
+            async initialize() {
+                this.setupEventListeners();
+                await this.loadProducts();
+            },
+
+            setupEventListeners() {
+                // Product selection
+                DOM.productSelect.addEventListener('change', (e) => {
+                    AppState.currentProduct = e.target.value;
+                    this.loadModels(e.target.value);
+                });
+
+                // Model selection
+                DOM.modelSelect.addEventListener('change', async (e) => {
+                    AppState.currentModel = e.target.value;
+                    if (AppState.currentProduct && e.target.value) {
+                        await this.loadModelData(AppState.currentProduct, e.target.value);
+                    }
+                });
+
+                // Lock toggles
+                DOM.lockQtyToggle.addEventListener('change', (e) => {
+                    AppState.lockQuantity = e.target.checked;
+                    DOM.quantityInput.disabled = AppState.lockQuantity;
+                });
+
+                DOM.lockRateToggle.addEventListener('change', (e) => {
+                    AppState.lockRate = e.target.checked;
+                    DOM.rateInput.disabled = AppState.lockRate;
+                });
+
+                // Input changes with debounce
+                const debouncedUpdate = Utils.debounce(() => this.updateMaterial(), 300);
+                DOM.quantityInput.addEventListener('input', debouncedUpdate);
+                DOM.rateInput.addEventListener('input', debouncedUpdate);
+
+                // Reset button
+                DOM.resetButton.addEventListener('click', () => this.resetToOriginal());
+
+                // Export buttons
+                DOM.exportModelBtn.addEventListener('click', () => this.exportModel());
+                DOM.exportComparisonBtn.addEventListener('click', () => this.exportComparison());
+                
+                // Save snapshot button
+                DOM.saveSnapshotBtn.addEventListener('click', () => this.showSaveModal());
+            },
+
+            async loadProducts() {
+                try {
+                    UIRenderer.setLoading(true);
+                    const data = await APIService.fetchProducts();
+                    
+                    DOM.productSelect.innerHTML = '<option value="">Select Product</option>';
+                    if (data.products && data.products.length > 0) {
+                        data.products.forEach(product => {
+                            DOM.productSelect.innerHTML += `<option value="${product}">${product}</option>`;
+                        });
+                        DOM.productSelect.disabled = false;
+                    } else {
+                        DOM.productSelect.innerHTML = '<option value="">No products available</option>';
+                    }
+                } catch (error) {
+                    UIRenderer.showError('Failed to load products');
+                    DOM.productSelect.innerHTML = '<option value="">Error loading products</option>';
+                } finally {
+                    UIRenderer.setLoading(false);
+                }
+            },
+
+            async loadModels(product) {
+                if (!product) return;
+
+                try {
+                    UIRenderer.setLoading(true);
+                    const data = await APIService.fetchModels(product);
+                    
+                    DOM.modelSelect.innerHTML = '<option value="">Select Model</option>';
+                    if (data.models && data.models.length > 0) {
+                        data.models.forEach(model => {
+                            DOM.modelSelect.innerHTML += `<option value="${model}">${model}</option>`;
+                        });
+                        DOM.modelSelect.disabled = false;
+                    } else {
+                        DOM.modelSelect.innerHTML = '<option value="">No models available</option>';
+                    }
+                } catch (error) {
+                    UIRenderer.showError('Failed to load models');
+                    DOM.modelSelect.innerHTML = '<option value="">Error loading models</option>';
+                } finally {
+                    UIRenderer.setLoading(false);
+                }
+            },
+
+            async loadModelData(product, model) {
+                try {
+                    UIRenderer.setLoading(true);
+                    const data = await APIService.fetchModelData(product, model);
+                    
+                    AppState.materials = JSON.parse(JSON.stringify(data.materials));
+                    AppState.originalMaterials = JSON.parse(JSON.stringify(data.materials));
+                    AppState.selectedMaterialIndex = null;
+                    AppState.originalSaved = false;
+
+                    UIRenderer.renderMaterialsTable(AppState.materials);
+                    UIRenderer.updateComparison(AppState.originalMaterials, AppState.materials);
+                    UIRenderer.updateTunerPanel(null);
+                    
+                    // Enable buttons
+                    DOM.exportModelBtn.disabled = false;
+                    DOM.exportComparisonBtn.disabled = false;
+                    DOM.saveSnapshotBtn.disabled = false;
+                    
+                    // ✅ ADDED: Auto-save original and load snapshots
+                    await this.saveOriginalToDatabase();
+                    await this.loadSavedSnapshots();
+                    DOM.savedSnapshotsPanel.style.display = 'block';
+                } catch (error) {
+                    UIRenderer.showError('Failed to load model data');
+                } finally {
+                    UIRenderer.setLoading(false);
+                }
+            },
+
+            async saveOriginalToDatabase() {
+                if (AppState.originalSaved) return;  // Don't save multiple times
+                
+                try {
+                    const finalCost = Utils.calculateTotalCost(AppState.originalMaterials);
+                    
+                    const data = await APIService.saveOriginalToDatabase({
+                        product: AppState.currentProduct,
+                        model: AppState.currentModel,
+                        materials: AppState.originalMaterials,
+                        final_cost: finalCost
+                    });
+                    
+                    if (data.success) {
+                        AppState.originalSaved = true;
+                        console.log("Original saved to database");
+                    }
+                } catch (error) {
+                    console.error("Error saving original:", error);
+                }
+            },
+
+            async loadSavedSnapshots() {
+                if (!AppState.currentProduct || !AppState.currentModel) return;
+                
+                try {
+                    const data = await APIService.fetchSavedSnapshots(AppState.currentProduct, AppState.currentModel);
+                    UIRenderer.renderSavedSnapshots(data.snapshots || []);
+                } catch (error) {
+                    console.error('Error loading snapshots:', error);
+                }
+            },
+
+            async saveSnapshot() {
+                if (!AppState.currentProduct || !AppState.currentModel || AppState.materials.length === 0) {
+                    UIRenderer.showError('Please select a model first');
+                    return;
+                }
+
+                try {
+                    UIRenderer.setLoading(true);
+                    const finalCost = Utils.calculateTotalCost(AppState.materials);
+                    
+                    const data = await APIService.saveSnapshot({
+                        product: AppState.currentProduct,
+                        model: AppState.currentModel,
+                        materials: AppState.materials,
+                        final_cost: finalCost,
+                        notes: DOM.snapshotNotes.value,
+                        is_original: false
+                    });
+                    
+                    if (data.success) {
+                        Utils.showAlert('✅ Snapshot saved successfully!', 'success');
+                        UIRenderer.hideSaveModal();
+                        await this.loadSavedSnapshots();  // Refresh list
+                    } else {
+                        UIRenderer.showError('❌ Error: ' + (data.error || "Unknown error"));
+                    }
+                } catch (error) {
+                    UIRenderer.showError('❌ Save failed: ' + error.message);
+                } finally {
+                    UIRenderer.setLoading(false);
+                }
+            },
+
+            async loadSnapshotData(snapshotId) {
+                if (!confirm("Load this snapshot? Current unsaved changes will be lost.")) {
+                    return;
+                }
+                
+                try {
+                    UIRenderer.setLoading(true);
+                    const data = await APIService.loadSnapshot(snapshotId);
+                    
+                    if (data.error) {
+                        UIRenderer.showError('Error: ' + data.error);
+                        return;
+                    }
+                    
+                    // Load snapshot data
+                    AppState.materials = JSON.parse(JSON.stringify(data.materials));
+                    
+                    // If loading original, also update originalMaterials
+                    if (data.is_original) {
+                        AppState.originalMaterials = JSON.parse(JSON.stringify(data.materials));
+                    }
+                    
+                    AppState.selectedMaterialIndex = null;
+                    
+                    UIRenderer.renderMaterialsTable(AppState.materials);
+                    UIRenderer.updateComparison(AppState.originalMaterials, AppState.materials);
+                    UIRenderer.updateTunerPanel(null);
+                    
+                    Utils.showAlert('✅ Snapshot loaded successfully!', 'success');
+                } catch (error) {
+                    UIRenderer.showError('Error loading snapshot: ' + error.message);
+                } finally {
+                    UIRenderer.setLoading(false);
+                }
+            },
+
+            async deleteSnapshot(snapshotId) {
+                if (!confirm("Delete this snapshot? This cannot be undone.")) {
+                    return;
+                }
+                
+                try {
+                    const data = await APIService.deleteSnapshot(snapshotId);
+                    
+                    if (data.success) {
+                        Utils.showAlert('✅ Snapshot deleted', 'success');
+                        await this.loadSavedSnapshots();  // Refresh list
+                    } else {
+                        UIRenderer.showError('Error: ' + (data.error || "Unknown error"));
+                    }
+                } catch (error) {
+                    UIRenderer.showError('Delete failed: ' + error.message);
+                }
+            },
+
+            showSaveModal() {
+                if (!AppState.currentProduct || !AppState.currentModel || AppState.materials.length === 0) {
+                    UIRenderer.showError('Please select a model first');
+                    return;
+                }
+                UIRenderer.showSaveModal();
+            },
+
+            refreshSavedSnapshots() {
+                this.loadSavedSnapshots();
+            },
+
+            selectMaterial(index) {
+                AppState.selectedMaterialIndex = index;
+                const material = AppState.materials[index];
+                
+                // Reset locks
+                AppState.lockQuantity = false;
+                AppState.lockRate = false;
+                DOM.lockQtyToggle.checked = false;
+                DOM.lockRateToggle.checked = false;
+                
+                UIRenderer.updateTunerPanel(material);
+            },
+
+            updateMaterial() {
+                if (AppState.selectedMaterialIndex === null) return;
+
+                const material = AppState.materials[AppState.selectedMaterialIndex];
+                
+                if (!AppState.lockQuantity) {
+                    material.quantity = parseFloat(DOM.quantityInput.value) || 0;
+                }
+                
+                if (!AppState.lockRate) {
+                    material.rate = parseFloat(DOM.rateInput.value) || 0;
+                }
+                
+                material.total = material.quantity * material.rate;
+                
+                UIRenderer.updateTunerPanel(material);
+                UIRenderer.renderMaterialsTable(AppState.materials);
+                UIRenderer.updateComparison(AppState.originalMaterials, AppState.materials);
+            },
+
+            resetToOriginal() {
+                AppState.materials = JSON.parse(JSON.stringify(AppState.originalMaterials));
+                AppState.selectedMaterialIndex = null;
+                
+                // Reset locks
+                AppState.lockQuantity = false;
+                AppState.lockRate = false;
+                DOM.lockQtyToggle.checked = false;
+                DOM.lockRateToggle.checked = false;
+                
+                UIRenderer.renderMaterialsTable(AppState.materials);
+                UIRenderer.updateComparison(AppState.originalMaterials, AppState.materials);
+                UIRenderer.updateTunerPanel(null);
+            },
+
+            async exportModel() {
+                if (!AppState.currentProduct || !AppState.currentModel || AppState.materials.length === 0) {
+                    UIRenderer.showError('Please select a model first');
+                    return;
+                }
+
+                try {
+                    UIRenderer.setLoading(true);
+                    const finalCost = Utils.calculateTotalCost(AppState.materials);
+                    
+                    const blob = await APIService.exportModelCSV({
+                        product: AppState.currentProduct,
+                        model: AppState.currentModel,
+                        materials: AppState.materials,
+                        final_cost: finalCost
+                    });
+                    
+                    this.downloadFile(blob, `${AppState.currentModel}_costing.csv`);
+                } catch (error) {
+                    UIRenderer.showError('Export failed. Please try again.');
+                } finally {
+                    UIRenderer.setLoading(false);
+                }
+            },
+
+            async exportComparison() {
+                if (!AppState.currentProduct || !AppState.currentModel || AppState.materials.length === 0) {
+                    UIRenderer.showError('Please select a model first');
+                    return;
+                }
+
+                try {
+                    UIRenderer.setLoading(true);
+                    const originalCost = Utils.calculateTotalCost(AppState.originalMaterials);
+                    const currentCost = Utils.calculateTotalCost(AppState.materials);
+                    
+                    const blob = await APIService.exportComparisonCSV({
+                        product: AppState.currentProduct,
+                        model: AppState.currentModel,
+                        original_materials: AppState.originalMaterials,
+                        current_materials: AppState.materials,
+                        original_cost: originalCost,
+                        current_cost: currentCost
+                    });
+                    
+                    this.downloadFile(blob, `${AppState.currentModel}_comparison.csv`);
+                } catch (error) {
+                    UIRenderer.showError('Export failed. Please try again.');
+                } finally {
+                    UIRenderer.setLoading(false);
+                }
+            },
+
+            downloadFile(blob, filename) {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            }
+        };
+
+        // Initialize application when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            AppController.initialize();
+        });
+
+        // Global functions for onclick handlers
+        window.saveSnapshot = () => AppController.saveSnapshot();
+        window.hideSaveModal = () => UIRenderer.hideSaveModal();
+        window.refreshSavedSnapshots = () => AppController.refreshSavedSnapshots();
+        
+        // Expose controller methods to global scope for inline onclick handlers
+        window.AppController = AppController;
+    </script>
+</body>
+</html>

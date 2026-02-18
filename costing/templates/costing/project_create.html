@@ -1,0 +1,521 @@
+{% extends 'costing/base.html' %}
+
+{% block title %}Create Project{% endblock %}
+
+{% block extra_css %}
+    <style>
+        /* =========================================================
+           ENTERPRISE CREATE PROJECT THEME (PLAIN CSS ONLY)
+           Inspired by Tailwind reference theme
+           ========================================================= */
+        
+        /* ---------- CSS VARIABLES ---------- */
+        :root {
+            --primary: #2badee;
+            --primary-dark: #1a9cdc;
+            --primary-light: rgba(43, 173, 238, 0.1);
+            
+            --bg-app: #f6f7f8;
+            --bg-panel: #ffffff;
+            --bg-muted: #f1f5f9;
+            
+            --border-soft: #e2e8f0;
+            --border-medium: #cbd5e1;
+            --border-strong: #94a3b8;
+            
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --text-light: #94a3b8;
+            
+            --error: #ef4444;
+            --error-light: rgba(239, 68, 68, 0.1);
+            
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+            --radius-xl: 16px;
+            
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.07);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.10);
+            --shadow-xl: 0 20px 40px rgba(0,0,0,0.12);
+            
+            --font-xs: 12px;
+            --font-sm: 14px;
+            --font-base: 15px;
+            --font-lg: 16px;
+            --font-xl: 18px;
+            --font-2xl: 24px;
+            --font-3xl: 32px;
+        }
+
+        /* ---------- RESET ---------- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* ---------- BODY ---------- */
+        body {
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-app);
+            color: var(--text-primary);
+            line-height: 1.5;
+            font-size: var(--font-base);
+            min-height: 100vh;
+        }
+
+        /* ---------- NAVIGATION ---------- */
+        .nav {
+            background: var(--bg-panel);
+            border-bottom: 1px solid var(--border-soft);
+            padding: 16px 32px;
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+
+        .brand-name {
+            font-size: var(--font-xl);
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+        }
+
+        .nav-link {
+            font-size: var(--font-sm);
+            font-weight: 500;
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 8px 0;
+            position: relative;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+        }
+
+        .nav-link.active {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--bg-muted);
+            border: 1px solid var(--border-soft);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: var(--font-sm);
+            font-weight: 600;
+        }
+
+        /* ---------- MAIN CONTAINER ---------- */
+        .main-container {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 48px 24px;
+        }
+
+        /* ---------- BREADCRUMB ---------- */
+        .breadcrumb {
+            margin-bottom: 32px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: var(--font-sm);
+            font-weight: 500;
+            color: var(--primary);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+        }
+
+        .back-link:hover {
+            background: var(--primary-light);
+            gap: 12px;
+        }
+
+        /* ---------- PAGE HEADER ---------- */
+        .page-header {
+            margin-bottom: 40px;
+        }
+
+        .page-title {
+            font-size: var(--font-3xl);
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: var(--font-base);
+            color: var(--text-muted);
+        }
+
+        /* ---------- MAIN FORM CARD ---------- */
+        .form-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-xl);
+            padding: 40px;
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 32px;
+        }
+
+        /* ---------- ERROR MESSAGE ---------- */
+        .error-message {
+            background: var(--error-light);
+            border: 1px solid var(--error);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            margin-bottom: 32px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .error-icon {
+            color: var(--error);
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .error-text {
+            color: var(--error);
+            font-size: var(--font-sm);
+            font-weight: 500;
+        }
+
+        /* ---------- FORM GROUPS ---------- */
+        .form-group {
+            margin-bottom: 32px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: var(--font-sm);
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .required {
+            color: var(--error);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: var(--font-base);
+            font-family: 'Inter', sans-serif;
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-md);
+            background: var(--bg-panel);
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .form-hint {
+            font-size: var(--font-xs);
+            color: var(--text-muted);
+            font-style: italic;
+            margin-top: 8px;
+        }
+
+        /* ---------- FORM ACTIONS ---------- */
+        .form-actions {
+            display: flex;
+            gap: 16px;
+            margin-top: 40px;
+            padding-top: 32px;
+            border-top: 1px solid var(--border-soft);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 32px;
+            font-size: var(--font-sm);
+            font-weight: 600;
+            border-radius: var(--radius-md);
+            border: 1px solid transparent;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 2px 8px rgba(43, 173, 238, 0.2);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(43, 173, 238, 0.3);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-soft);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-muted);
+            border-color: var(--primary);
+        }
+
+        /* ---------- SYSTEM STATUS ---------- */
+        .system-status {
+            text-align: center;
+            margin-top: 48px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-soft);
+        }
+
+        .status-grid {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: var(--font-xs);
+            color: var(--text-muted);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+        }
+
+        .status-icon {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .version {
+            font-size: var(--font-xs);
+            color: var(--text-light);
+            margin-top: 8px;
+        }
+
+        /* ---------- BACKGROUND DECORATION ---------- */
+        .bg-decoration {
+            position: fixed;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .bg-circle-1 {
+            top: -10%;
+            left: -10%;
+            width: 40%;
+            height: 40%;
+            background: var(--primary-light);
+            border-radius: 50%;
+            filter: blur(60px);
+        }
+
+        .bg-circle-2 {
+            bottom: -10%;
+            right: -10%;
+            width: 40%;
+            height: 40%;
+            background: rgba(43, 173, 238, 0.1);
+            border-radius: 50%;
+            filter: blur(60px);
+        }
+
+        /* ---------- RESPONSIVE ---------- */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 32px 16px;
+            }
+            
+            .form-card {
+                padding: 24px;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .status-grid {
+                flex-direction: column;
+                gap: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav {
+                padding: 16px;
+            }
+            
+            .page-title {
+                font-size: var(--font-2xl);
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    
+    <!-- Background Decorations -->
+    <div class="bg-decoration bg-circle-1"></div>
+    <div class="bg-decoration bg-circle-2"></div>
+
+    <div class="main-container">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <a href="{% url 'project_list' %}" class="back-link">
+                <span class="material-icons">arrow_back</span>
+                Back to Projects
+            </a>
+        </div>
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">Create New Project</h1>
+            <p class="page-subtitle">Fill in the details below to initialize your manufacturing cost optimization project.</p>
+        </div>
+
+        <!-- Main Form Card -->
+        <div class="form-card">
+            <!-- Error Message -->
+            {% if error %}
+            <div class="error-message">
+                <span class="material-icons error-icon">error</span>
+                <p class="error-text">{{ error }}</p>
+            </div>
+            {% endif %}
+            
+            <form method="POST">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        Project Name <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        name="name" 
+                        required 
+                        placeholder="e.g., Reliance Q4 2025"
+                        autofocus
+                        class="form-control"
+                    >
+                    <p class="form-hint">Choose a unique, descriptive name for this project</p>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Client Name</label>
+                    <input 
+                        type="text" 
+                        name="client_name" 
+                        placeholder="e.g., Reliance Industries Ltd."
+                        class="form-control"
+                    >
+                    <p class="form-hint">Optional: Name of the client company</p>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea 
+                        name="description" 
+                        placeholder="Brief description of the project, objectives, or notes..."
+                        class="form-control"
+                    ></textarea>
+                    <p class="form-hint">Optional: Add any relevant details about this project</p>
+                </div>
+                
+                <div class="form-actions">
+                    <a href="{% url 'project_list' %}" class="btn btn-secondary">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <span class="material-icons">check</span>
+                        Create Project
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+</html>

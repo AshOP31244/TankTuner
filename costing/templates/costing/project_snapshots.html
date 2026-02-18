@@ -1,0 +1,718 @@
+{% extends 'costing/base.html' %}
+
+{% block title %}Project Analytics{% endblock %}
+
+{% block extra_css %}
+    <style>
+/* Same CSS Variables */
+:root {
+  --bg-app: #f6f6f8;
+  --bg-panel: #ffffff;
+  --bg-muted: #f1f5f9;
+  --border-soft: #e2e8f0;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --text-light: #94a3b8;
+  --primary: #144bb8;
+  --primary-light: rgba(20, 75, 184, 0.08);
+  --primary-dark: #0d3a8c;
+  --success: #22c55e;
+  --success-light: rgba(34, 197, 94, 0.12);
+  --danger: #dc2626;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.07);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --font-xs: 11px;
+  --font-sm: 13px;
+  --font-base: 14px;
+  --font-lg: 16px;
+  --font-xl: 18px;
+  --font-2xl: 22px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg-app);
+  color: var(--text-primary);
+  line-height: 1.5;
+  font-size: var(--font-base);
+  min-height: 100vh;
+}
+
+/* Toast Notifications */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.toast {
+  background: white;
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 300px;
+  animation: slideIn 0.3s ease;
+  border-left: 4px solid var(--primary);
+}
+
+.toast.success { border-left-color: var(--success); }
+.toast.error { border-left-color: var(--danger); }
+
+.toast-icon { font-size: 20px; flex-shrink: 0; }
+.toast.success .toast-icon { color: var(--success); }
+.toast.error .toast-icon { color: var(--danger); }
+
+.toast-message {
+  flex: 1;
+  font-size: var(--font-sm);
+  font-weight: 500;
+}
+
+.toast-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  opacity: 0.5;
+}
+
+.toast-close:hover { opacity: 1; }
+
+@keyframes slideIn {
+  from { transform: translateX(400px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* Container */
+.container {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+/* Header */
+.header {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 30px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-left h1 {
+  font-size: var(--font-2xl);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.header-left p {
+  font-size: var(--font-sm);
+  color: var(--text-muted);
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  font-size: var(--font-sm);
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+  border: 1px solid var(--primary-dark);
+}
+
+.btn-primary:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-secondary {
+  border-color: var(--border-soft);
+  color: var(--text-secondary);
+  background: white;
+}
+
+.btn-secondary:hover {
+  background: var(--bg-muted);
+  transform: translateY(-1px);
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #b91c1c;
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: var(--font-xs);
+}
+
+/* Filters */
+.filters-bar {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 200px;
+}
+
+.filter-label {
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.filter-select {
+  padding: 10px 12px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  background: var(--bg-muted);
+  font-size: var(--font-sm);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: white;
+}
+
+/* Stats Summary */
+.stats-summary {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-sm);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.summary-stat {
+  text-align: center;
+  padding: 16px;
+  background: var(--bg-muted);
+  border-radius: var(--radius-md);
+}
+
+.summary-stat-label {
+  font-size: var(--font-xs);
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.summary-stat-value {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.summary-stat-value.success {
+  color: var(--success);
+}
+
+/* Snapshots Grid */
+.snapshots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.snapshot-card {
+  background: white;
+  border: 2px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  transition: all 0.2s;
+  box-shadow: var(--shadow-sm);
+}
+
+.snapshot-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.snapshot-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 16px;
+}
+
+.snapshot-badge {
+  font-size: var(--font-xs);
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 12px;
+  text-transform: uppercase;
+}
+
+.badge-original {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.badge-modified {
+  background: var(--success-light);
+  color: var(--success);
+}
+
+.snapshot-info h3 {
+  font-size: var(--font-lg);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.snapshot-product {
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.snapshot-meta {
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.snapshot-notes {
+  background: var(--bg-muted);
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+  min-height: 70px;
+  line-height: 1.6;
+}
+
+.snapshot-notes.empty {
+  font-style: italic;
+  color: var(--text-light);
+}
+
+.snapshot-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.stat-item {
+  background: var(--bg-muted);
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  text-align: center;
+}
+
+.stat-item-label {
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.stat-item-value {
+  font-size: var(--font-lg);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.stat-item-value.savings {
+  color: var(--success);
+}
+
+.stat-item-value.increase {
+  color: var(--danger);
+}
+
+.snapshot-actions {
+  display: flex;
+  gap: 8px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-soft);
+}
+
+/* Empty State */
+.empty-state {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 60px 40px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.empty-state-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  opacity: 0.3;
+}
+
+.empty-state h3 {
+  font-size: var(--font-lg);
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.empty-state p {
+  color: var(--text-muted);
+  margin-bottom: 24px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container { padding: 16px; }
+  .header { flex-direction: column; gap: 16px; align-items: flex-start; }
+  .header-actions { width: 100%; flex-direction: column; }
+  .btn { width: 100%; justify-content: center; }
+  .filters-bar { flex-direction: column; }
+  .filter-group { width: 100%; }
+  .snapshots-grid { grid-template-columns: 1fr; }
+  .stats-summary { grid-template-columns: 1fr; }
+}
+    </style>
+{% endblock %}
+{% block content %}
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <h1><i class="fas fa-history"></i> Saved Snapshots</h1>
+                <p>{{ project.name }} - All Optimization History</p>
+            </div>
+            <div class="header-actions">
+                <a href="{% url 'project_detail' project.id %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Project
+                </a>
+                <a href="{% url 'project_tuner' project.id %}" class="btn btn-primary">
+                    <i class="fas fa-sliders-h"></i> Cost Tuner
+                </a>
+            </div>
+        </div>
+
+        <!-- Filters Bar -->
+        <div class="filters-bar">
+            <div class="filter-group">
+                <label class="filter-label">Product Type</label>
+                <select class="filter-select" id="productFilter" onchange="filterSnapshots()">
+                    <option value="">All Products</option>
+                    {% for product in products %}
+                    <option value="{{ product }}">{{ product }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label class="filter-label">Model</label>
+                <select class="filter-select" id="modelFilter" onchange="filterSnapshots()">
+                    <option value="">All Models</option>
+                    {% for model in models %}
+                    <option value="{{ model }}">{{ model }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label class="filter-label">Type</label>
+                <select class="filter-select" id="typeFilter" onchange="filterSnapshots()">
+                    <option value="">All Types</option>
+                    <option value="original">Original Only</option>
+                    <option value="modified">Modified Only</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label class="filter-label">Sort By</label>
+                <select class="filter-select" id="sortFilter" onchange="filterSnapshots()">
+                    <option value="recent">Most Recent</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="savings">Highest Savings</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Stats Summary -->
+        <div class="stats-summary">
+            <div class="summary-stat">
+                <div class="summary-stat-label">Total Snapshots</div>
+                <div class="summary-stat-value">{{ snapshots|length }}</div>
+            </div>
+            <div class="summary-stat">
+                <div class="summary-stat-label">Modified</div>
+                <div class="summary-stat-value">{{ modified_count }}</div>
+            </div>
+            <div class="summary-stat">
+                <div class="summary-stat-label">Total Savings</div>
+                <div class="summary-stat-value success">₹{{ total_savings|floatformat:0 }}</div>
+            </div>
+        </div>
+
+        <!-- Snapshots Grid -->
+        {% if snapshots %}
+        <div class="snapshots-grid" id="snapshotsContainer">
+            {% for snapshot in snapshots %}
+            <div class="snapshot-card" 
+                 data-product="{{ snapshot.product_type }}" 
+                 data-model="{{ snapshot.model_name }}" 
+                 data-type="{% if snapshot.is_original %}original{% else %}modified{% endif %}"
+                 data-date="{{ snapshot.saved_at|date:'Y-m-d H:i:s' }}"
+                 data-savings="{{ snapshot.savings|default:0 }}">
+                <div class="snapshot-card-header">
+                    <div class="snapshot-badge {% if snapshot.is_original %}badge-original{% else %}badge-modified{% endif %}">
+                        {% if snapshot.is_original %}ORIGINAL{% else %}OPTIMIZED{% endif %}
+                    </div>
+                </div>
+
+                <div class="snapshot-info">
+                    <h3>{{ snapshot.model_name }}</h3>
+                    <div class="snapshot-product">
+                        <i class="fas fa-box"></i> {{ snapshot.product_type }}
+                    </div>
+                    <div class="snapshot-meta">
+                        <i class="far fa-calendar"></i>
+                        {{ snapshot.saved_at|date:"M d, Y" }}
+                        <span style="margin: 0 8px;">•</span>
+                        <i class="far fa-clock"></i>
+                        {{ snapshot.saved_at|date:"H:i" }}
+                    </div>
+                </div>
+
+                <div class="snapshot-notes {% if not snapshot.notes %}empty{% endif %}">
+                    {% if snapshot.notes %}
+                        {{ snapshot.notes }}
+                    {% else %}
+                        No optimization notes provided
+                    {% endif %}
+                </div>
+
+                <div class="snapshot-stats">
+                    <div class="stat-item">
+                        <div class="stat-item-label">Final Cost</div>
+                        <div class="stat-item-value">₹{{ snapshot.final_cost|floatformat:0 }}</div>
+                    </div>
+
+                    {% if snapshot.comparison %}
+                    <div class="stat-item">
+                        <div class="stat-item-label">vs Original</div>
+                        <div class="stat-item-value {% if snapshot.comparison.is_savings %}savings{% else %}increase{% endif %}">
+                            {% if snapshot.comparison.is_savings %}-{% else %}+{% endif %}₹{{ snapshot.comparison.difference|floatformat:0 }}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="snapshot-actions">
+                    <button onclick="openInTuner({{ snapshot.id }})" class="btn btn-primary btn-sm" style="flex: 1;">
+                        <i class="fas fa-folder-open"></i> Open in Tuner
+                    </button>
+                    {% if not snapshot.is_original %}
+                    <button onclick="deleteSnapshot({{ snapshot.id }})" class="btn btn-danger btn-sm">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fas fa-history"></i>
+            </div>
+            <h3>No Snapshots Yet</h3>
+            <p>Start optimizing costs and saving snapshots to see them here</p>
+            <a href="{% url 'project_tuner' project.id %}" class="btn btn-primary">
+                <i class="fas fa-sliders-h"></i> Go to Cost Tuner
+            </a>
+        </div>
+        {% endif %}
+    </div>
+    {% endblock %}
+    {% block extra_js %}
+    <script>
+        // Toast System
+        const Toast = {
+            show(message, type = 'info') {
+                const container = document.getElementById('toastContainer');
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                
+                let icon = 'ℹ️';
+                if (type === 'success') icon = '✅';
+                if (type === 'error') icon = '❌';
+                
+                toast.innerHTML = `
+                    <div class="toast-icon">${icon}</div>
+                    <div class="toast-message">${message}</div>
+                    <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+                `;
+                
+                container.appendChild(toast);
+                setTimeout(() => toast.remove(), 4000);
+            }
+        };
+
+        // Filter Snapshots
+        function filterSnapshots() {
+            const productFilter = document.getElementById('productFilter').value.toLowerCase();
+            const modelFilter = document.getElementById('modelFilter').value.toLowerCase();
+            const typeFilter = document.getElementById('typeFilter').value;
+            const sortFilter = document.getElementById('sortFilter').value;
+            
+            const cards = Array.from(document.querySelectorAll('.snapshot-card'));
+            
+            // Filter
+            cards.forEach(card => {
+                const product = card.dataset.product.toLowerCase();
+                const model = card.dataset.model.toLowerCase();
+                const type = card.dataset.type;
+                
+                const matchProduct = !productFilter || product.includes(productFilter);
+                const matchModel = !modelFilter || model.includes(modelFilter);
+                const matchType = !typeFilter || type === typeFilter;
+                
+                if (matchProduct && matchModel && matchType) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // Sort
+            const visibleCards = cards.filter(card => card.style.display !== 'none');
+            const container = document.getElementById('snapshotsContainer');
+            
+            visibleCards.sort((a, b) => {
+                if (sortFilter === 'recent') {
+                    return new Date(b.dataset.date) - new Date(a.dataset.date);
+                } else if (sortFilter === 'oldest') {
+                    return new Date(a.dataset.date) - new Date(b.dataset.date);
+                } else if (sortFilter === 'savings') {
+                    return parseFloat(b.dataset.savings) - parseFloat(a.dataset.savings);
+                }
+            });
+            
+            visibleCards.forEach(card => container.appendChild(card));
+        }
+
+        // Delete Snapshot
+        function deleteSnapshot(snapshotId) {
+            if (!confirm('Delete this snapshot? This cannot be undone.')) {
+                return;
+            }
+            
+            fetch(`/api/delete-snapshot/${snapshotId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    Toast.show('Snapshot deleted successfully', 'success');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    Toast.show('Failed to delete snapshot', 'error');
+                }
+            })
+            .catch(err => {
+                Toast.show('Error deleting snapshot', 'error');
+            });
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        // Open snapshot in tuner
+        function openInTuner(snapshotId) {
+            // Store the snapshot ID in localStorage
+            localStorage.setItem('loadSnapshotOnOpen', snapshotId);
+            
+            // Redirect to tuner
+            window.location.href = "{% url 'project_tuner' project.id %}";
+        }
+    </script>
+{% endblock %}
+</html>

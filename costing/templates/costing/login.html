@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TankTuner - Sign In</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2badee;
+            --primary-dark: #1e8bc3;
+            --bg-light: #f6f7f8;
+            --bg-dark: #101c22;
+            --slate-900: #0f172a;
+            --slate-800: #1e293b;
+            --slate-700: #334155;
+            --slate-500: #64748b;
+            --slate-400: #94a3b8;
+            --slate-300: #cbd5e1;
+            --slate-200: #e2e8f0;
+            --slate-100: #f1f5f9;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-light);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .main-container {
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Left Section - Branding */
+        .branding-section {
+            position: relative;
+            width: 40%;
+            background: var(--bg-dark);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 48px 64px;
+            overflow: hidden;
+        }
+
+        .bg-decoration {
+            position: absolute;
+            top: -80px;
+            right: -80px;
+            opacity: 0.1;
+            width: 384px;
+            height: 384px;
+            pointer-events: none;
+        }
+
+        .logo-area {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon .material-icons-round {
+            color: white;
+            font-size: 24px;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+            letter-spacing: -0.02em;
+        }
+
+        .value-proposition {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        .value-proposition h2 {
+            font-size: 36px;
+            font-weight: 600;
+            color: white;
+            line-height: 1.2;
+        }
+
+        .value-proposition h2 .highlight {
+            color: var(--primary);
+        }
+
+        .value-proposition > p {
+            margin-top: 16px;
+            color: var(--slate-400);
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        .features-list {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .feature-icon {
+            margin-top: 4px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(43, 173, 238, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .feature-icon .material-icons-round {
+            color: var(--primary);
+            font-size: 14px;
+        }
+
+        .feature-content h3 {
+            color: white;
+            font-weight: 500;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .feature-content p {
+            color: var(--slate-400);
+            font-size: 14px;
+        }
+
+        .footer-left {
+            position: relative;
+            z-index: 10;
+            color: var(--slate-500);
+            font-size: 12px;
+        }
+
+        /* Right Section - Login Form */
+        .login-section {
+            flex: 1;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 48px 96px;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 448px;
+        }
+
+        .login-header {
+            margin-bottom: 40px;
+        }
+
+        .login-header h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--slate-900);
+            margin-bottom: 8px;
+        }
+
+        .login-header p {
+            color: var(--slate-500);
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--slate-700);
+            margin-bottom: 6px;
+        }
+
+        .label-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .forgot-link {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--primary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .forgot-link:hover {
+            color: var(--primary-dark);
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        .input-icon .material-icons-round {
+            color: var(--slate-400);
+            font-size: 20px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 12px 12px 40px;
+            border: 1px solid var(--slate-200);
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--slate-900);
+            background: white;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(43, 173, 238, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: var(--slate-400);
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .password-toggle .material-icons-round {
+            color: var(--slate-400);
+            font-size: 20px;
+            transition: color 0.2s;
+        }
+
+        .password-toggle:hover .material-icons-round {
+            color: var(--slate-700);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .checkbox-input {
+            width: 16px;
+            height: 16px;
+            border: 1px solid var(--slate-300);
+            border-radius: 4px;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+
+        .checkbox-label {
+            margin-left: 8px;
+            font-size: 14px;
+            color: var(--slate-700);
+            cursor: pointer;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(43, 173, 238, 0.2);
+        }
+
+        .submit-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(43, 173, 238, 0.3);
+        }
+
+        .submit-btn:active {
+            transform: scale(0.98);
+        }
+
+        .form-footer {
+            margin-top: 48px;
+            padding-top: 32px;
+            border-top: 1px solid var(--slate-100);
+            text-align: center;
+        }
+
+        .form-footer p {
+            font-size: 14px;
+            color: var(--slate-500);
+            margin-bottom: 16px;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+        }
+
+        .footer-link {
+            font-size: 12px;
+            color: var(--slate-400);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-link:hover {
+            color: var(--primary);
+        }
+
+        .error-message {
+            background: #fee2e2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .error-message .material-icons-round {
+            font-size: 20px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .branding-section {
+                width: 45%;
+                padding: 32px 48px;
+            }
+
+            .login-section {
+                padding: 32px 48px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+
+            .branding-section {
+                width: 100%;
+                min-height: 40vh;
+                padding: 24px 32px;
+            }
+
+            .value-proposition h2 {
+                font-size: 28px;
+            }
+
+            .features-list {
+                display: none;
+            }
+
+            .login-section {
+                padding: 32px 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="main-container">
+        <!-- Left Section: Branding -->
+        <section class="branding-section">
+            <!-- Background Decoration -->
+            <div class="bg-decoration">
+                <svg width="384" height="384" viewBox="0 0 384 384" fill="none">
+                    <circle cx="192" cy="192" r="160" stroke="currentColor" stroke-width="2" opacity="0.3"/>
+                    <circle cx="192" cy="192" r="120" stroke="currentColor" stroke-width="2" opacity="0.3"/>
+                    <circle cx="192" cy="192" r="80" stroke="currentColor" stroke-width="2" opacity="0.3"/>
+                </svg>
+            </div>
+
+            <!-- Logo -->
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <span class="material-icons-round">precision_manufacturing</span>
+                </div>
+                <h1 class="logo-text">TankTuner</h1>
+            </div>
+
+            <!-- Value Proposition -->
+            <div class="value-proposition">
+                <div>
+                    <h2>
+                        Manufacturing Intelligence & <span class="highlight">Cost Optimization.</span>
+                    </h2>
+                    <p>
+                        Streamlining the enterprise tank manufacturing workflow through data-driven precision.
+                    </p>
+                </div>
+
+                <ul class="features-list">
+                    <li class="feature-item">
+                        <div class="feature-icon">
+                            <span class="material-icons-round">check</span>
+                        </div>
+                        <div class="feature-content">
+                            <h3>Optimize Tank Costs</h3>
+                            <p>Real-time material and labor cost tracking.</p>
+                        </div>
+                    </li>
+                    <li class="feature-item">
+                        <div class="feature-icon">
+                            <span class="material-icons-round">check</span>
+                        </div>
+                        <div class="feature-content">
+                            <h3>Simulate Scenarios</h3>
+                            <p>A/B test manufacturing parameters instantly.</p>
+                        </div>
+                    </li>
+                    <li class="feature-item">
+                        <div class="feature-icon">
+                            <span class="material-icons-round">check</span>
+                        </div>
+                        <div class="feature-content">
+                            <h3>Reduce Manual Error</h3>
+                            <p>Automated validation for complex tank models.</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer-left">
+                <p>© 2024 TankTuner Enterprise Solutions. All rights reserved.</p>
+            </div>
+        </section>
+
+        <!-- Right Section: Login Form -->
+        <section class="login-section">
+            <div class="login-container">
+                <div class="login-header">
+                    <h2>Sign In</h2>
+                    <p>Access your optimization dashboard</p>
+                </div>
+
+                {% if error %}
+                <div class="error-message">
+                    <span class="material-icons-round">error</span>
+                    <span>{{ error }}</span>
+                </div>
+                {% endif %}
+
+                <form method="POST" action="{% url 'login' %}">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="username">Username or Email</label>
+                        <div class="input-wrapper">
+                            <div class="input-icon">
+                                <span class="material-icons-round">person</span>
+                            </div>
+                            <input 
+                                type="text" 
+                                id="username" 
+                                name="username" 
+                                class="form-input" 
+                                placeholder="name@company.com" 
+                                required
+                                autofocus
+                            />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="label-row">
+                            <label class="form-label" for="password">Password</label>
+                            <a href="#" class="forgot-link">Forgot Password?</a>
+                        </div>
+                        <div class="input-wrapper">
+                            <div class="input-icon">
+                                <span class="material-icons-round">lock</span>
+                            </div>
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password" 
+                                class="form-input" 
+                                placeholder="••••••••" 
+                                required
+                            />
+                            <div class="password-toggle" onclick="togglePassword()">
+                                <span class="material-icons-round" id="toggleIcon">visibility</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="remember" name="remember" class="checkbox-input">
+                        <label for="remember" class="checkbox-label">Keep me logged in</label>
+                    </div>
+
+                    <button type="submit" class="submit-btn">
+                        Log In
+                    </button>
+                </form>
+
+                <div class="form-footer">
+                    <p>Secure internal tool for authorized personnel only.</p>
+                    <div class="footer-links">
+                        <a href="#" class="footer-link">Privacy Policy</a>
+                        <a href="#" class="footer-link">Security Terms</a>
+                        <a href="#" class="footer-link">Contact Support</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.textContent = 'visibility_off';
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.textContent = 'visibility';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,2217 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cost Tuner - {{ project.name }}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+/* =========================================================
+   ENTERPRISE DASHBOARD THEME + TOAST NOTIFICATIONS
+   ========================================================= */
+
+/* ---------- CSS VARIABLES ---------- */
+:root {
+  --bg-app: #f6f6f8;
+  --bg-panel: #ffffff;
+  --bg-muted: #f1f5f9;
+  --bg-dark: #111621;
+  
+  --border-soft: #e2e8f0;
+  --border-medium: #cbd5e1;
+  --border-strong: #94a3b8;
+  
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --text-light: #94a3b8;
+  
+  --primary: #144bb8;
+  --primary-light: rgba(20, 75, 184, 0.08);
+  --primary-dark: #0d3a8c;
+  
+  --success: #22c55e;
+  --success-light: rgba(34, 197, 94, 0.12);
+  --danger: #dc2626;
+  
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 16px;
+  
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.07);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.10);
+  
+  --font-xs: 11px;
+  --font-sm: 13px;
+  --font-base: 14px;
+  --font-lg: 16px;
+  --font-xl: 18px;
+  --font-2xl: 22px;
+}
+
+/* ---------- RESET ---------- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ---------- BODY ---------- */
+body {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg-app);
+  color: var(--text-primary);
+  line-height: 1.5;
+  font-size: var(--font-base);
+  min-height: 100vh;
+}
+
+/* ---------- TOAST NOTIFICATIONS ---------- */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.toast {
+  background: white;
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 300px;
+  max-width: 400px;
+  animation: slideIn 0.3s ease;
+  border-left: 4px solid var(--primary);
+}
+
+.toast.success {
+  border-left-color: var(--success);
+}
+
+.toast.error {
+  border-left-color: var(--danger);
+}
+
+.toast.warning {
+  border-left-color: #f59e0b;
+}
+
+.toast-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.toast.success .toast-icon {
+  color: var(--success);
+}
+
+.toast.error .toast-icon {
+  color: var(--danger);
+}
+
+.toast.warning .toast-icon {
+  color: #f59e0b;
+}
+
+.toast-message {
+  flex: 1;
+  font-size: var(--font-sm);
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.toast-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  font-size: 18px;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+
+.toast-close:hover {
+  opacity: 1;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+}
+
+/* ---------- LAYOUT ---------- */
+.container {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ---------- HEADER ---------- */
+.header {
+  background: white;
+  border-bottom: 1px solid var(--border-soft);
+  padding: 0;
+  height: 64px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-content {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: opacity 0.2s;
+}
+
+.navbar-brand:hover {
+  opacity: 0.8;
+}
+
+.brand-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: white;
+  transition: transform 0.2s;
+}
+
+.navbar-brand:hover .brand-icon {
+  transform: scale(1.05);
+}
+
+.brand-text h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.brand-text p {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.brand-subtitle {
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 2px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* ---------- BUTTONS ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  font-size: var(--font-sm);
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  background: white;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  color: var(--text-secondary);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+  border: 1px solid var(--primary-dark);
+}
+
+.btn-secondary {
+  border-color: var(--border-soft);
+  color: var(--text-secondary);
+  background: white;
+}
+
+.btn-success {
+  background: var(--success);
+  color: white;
+  border: 1px solid #16a34a;
+}
+
+.btn-info {
+  background: linear-gradient(to right, var(--primary), #1e40af);
+  color: white;
+  border: none;
+  box-shadow: 0 2px 6px rgba(20, 75, 184, 0.2);
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: var(--font-xs);
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-muted);
+}
+
+.btn-primary:hover {
+  background: var(--primary-dark);
+}
+
+/* ---------- MAIN CONTENT LAYOUT ---------- */
+.main-content {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+/* ---------- LEFT SIDEBAR ---------- */
+.sidebar {
+  width: 280px;
+  background: white;
+  border-right: 1px solid var(--border-soft);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.sidebar-section {
+  margin-bottom: 8px;
+}
+
+.sidebar-label {
+  font-size: var(--font-xs);
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+  padding-left: 4px;
+}
+
+/* ---------- FORMS ---------- */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-label {
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.form-select,
+.form-input,
+textarea {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: var(--font-sm);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-soft);
+  background: var(--bg-muted);
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+  font-family: 'Inter', sans-serif;
+}
+
+.form-select:focus,
+.form-input:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(20, 75, 184, 0.1);
+}
+
+/* ---------- WORKSPACE ---------- */
+.workspace {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.workspace-header {
+  margin-bottom: 24px;
+}
+
+.breadcrumbs {
+  display: flex;
+  gap: 8px;
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.breadcrumbs span {
+  color: var(--text-secondary);
+}
+
+.workspace-title {
+  font-size: var(--font-2xl);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.workspace-subtitle {
+  font-size: var(--font-sm);
+  color: var(--text-muted);
+}
+
+.workspace-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+/* ---------- TABLE ---------- */
+.table-container {
+  background: white;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 24px;
+}
+
+.materials-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-sm);
+}
+
+.materials-table thead {
+  background: var(--bg-muted);
+}
+
+.materials-table th {
+  text-align: left;
+  padding: 14px 20px;
+  font-size: var(--font-xs);
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.materials-table td {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-soft);
+  color: var(--text-secondary);
+}
+
+.materials-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.materials-table tbody tr:hover {
+  background: var(--primary-light);
+}
+
+.material-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.material-spec {
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.cost-cell {
+  font-weight: 700;
+  color: var(--primary);
+  text-align: right;
+}
+
+.table-total {
+  background: var(--bg-muted);
+  border-top: 2px solid var(--border-soft);
+}
+
+.table-total td {
+  font-weight: 800;
+  font-size: var(--font-lg);
+  color: var(--primary);
+  padding: 20px;
+}
+
+/* ---------- TUNER PANEL ---------- */
+.tuner-section {
+  width: 340px;
+  background: white;
+  border-left: 1px solid var(--border-soft);
+  padding: 24px;
+}
+
+.tuner-panel {
+  background: white;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: 24px;
+}
+
+.tuner-header {
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.tuner-material-name {
+  font-size: var(--font-lg);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.input-group {
+  margin-bottom: 16px;
+}
+
+.input-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+.toggle-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--font-xs);
+  color: var(--text-light);
+}
+
+.cost-display {
+  background: var(--primary-light);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  text-align: center;
+  margin: 24px 0;
+  border: 1px solid rgba(20, 75, 184, 0.1);
+}
+
+.cost-label {
+  font-size: var(--font-xs);
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+.cost-value {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+/* ---------- COMPARISON BAR ---------- */
+.comparison-panel {
+  background: white;
+  border-top: 1px solid var(--border-soft);
+  padding: 20px 24px;
+  position: sticky;
+  bottom: 0;
+  z-index: 50;
+  box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+}
+
+.comparison-grid {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+}
+
+.comparison-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.comparison-label {
+  font-size: var(--font-xs);
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.comparison-value {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.comparison-value.line-through {
+  color: var(--text-light);
+  text-decoration: line-through;
+}
+
+.savings-badge {
+  background: var(--success-light);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  padding: 12px 20px;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.savings-label {
+  font-size: var(--font-xs);
+  font-weight: 700;
+  color: var(--success);
+  text-transform: uppercase;
+}
+
+.savings-value {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--success);
+}
+
+.comparison-actions {
+  display: flex;
+  gap: 12px;
+  margin-left: auto;
+}
+
+/* ---------- SNAPSHOTS VIEWER ---------- */
+.snapshots-viewer {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.snapshots-content {
+  background: white;
+  width: 90%;
+  max-width: 1200px;
+  max-height: 90vh;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.snapshots-header {
+  padding: 24px;
+  border-bottom: 1px solid var(--border-soft);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.snapshots-header h2 {
+  font-size: var(--font-xl);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.snapshots-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.snapshot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+.snapshot-card {
+  background: var(--bg-muted);
+  border: 2px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.snapshot-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.snapshot-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 12px;
+}
+
+.snapshot-badge {
+  font-size: var(--font-xs);
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 12px;
+  text-transform: uppercase;
+}
+
+.badge-original {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.badge-modified {
+  background: var(--success-light);
+  color: var(--success);
+}
+
+.snapshot-info h3 {
+  font-size: var(--font-lg);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.snapshot-meta {
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.snapshot-notes {
+  background: white;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+  min-height: 60px;
+}
+
+.snapshot-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.stat-item {
+  background: white;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+}
+
+.stat-item-label {
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.stat-item-value {
+  font-size: var(--font-lg);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.stat-item-value.savings {
+  color: var(--success);
+}
+
+.snapshot-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+/* ---------- MODAL (SHARED BASE) ---------- */
+.save-modal, .preview-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.save-modal-content, .preview-modal-content {
+  background: white;
+  width: 100%;
+  max-width: 480px;
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-soft);
+}
+
+.save-modal h3, .preview-modal h3 {
+  font-size: var(--font-xl);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.save-modal textarea {
+  width: 100%;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-soft);
+  background: var(--bg-muted);
+  font-family: 'Inter', sans-serif;
+  font-size: var(--font-sm);
+  margin-bottom: 24px;
+  resize: vertical;
+  min-height: 100px;
+}
+
+.save-modal-actions, .preview-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* ---------- 🎯 NEW: PREVIEW MODAL SPECIFIC STYLES ---------- */
+.preview-modal-content {
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.preview-summary {
+  background: var(--bg-muted);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.preview-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.preview-summary-row:last-child {
+  border-bottom: none;
+}
+
+.preview-summary-label {
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.preview-summary-value {
+  font-size: var(--font-lg);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.preview-summary-value.line-through {
+  text-decoration: line-through;
+  color: var(--text-light);
+}
+
+.preview-summary-value.savings {
+  color: var(--success);
+}
+
+.preview-summary-value.increase {
+  color: var(--danger);
+}
+
+.preview-difference-card {
+  background: var(--success-light);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-top: 16px;
+  text-align: center;
+}
+
+.preview-difference-card.increase {
+  background: rgba(220, 38, 38, 0.1);
+  border-color: rgba(220, 38, 38, 0.2);
+}
+
+.preview-difference-label {
+  font-size: var(--font-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--success);
+  margin-bottom: 8px;
+}
+
+.preview-difference-card.increase .preview-difference-label {
+  color: var(--danger);
+}
+
+.preview-difference-value {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--success);
+}
+
+.preview-difference-card.increase .preview-difference-value {
+  color: var(--danger);
+}
+
+.preview-changes-section {
+  margin-bottom: 24px;
+}
+
+.preview-changes-header {
+  font-size: var(--font-sm);
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--border-soft);
+}
+
+.preview-changes-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.preview-change-item {
+  background: var(--bg-muted);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  margin-bottom: 8px;
+}
+
+.preview-change-name {
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.preview-change-detail {
+  font-size: var(--font-xs);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.preview-change-arrow {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.preview-no-changes {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+}
+
+.preview-no-changes-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  opacity: 0.3;
+}
+
+/* ---------- UTILITY CLASSES ---------- */
+.hidden {
+  display: none !important;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+}
+
+.empty-state-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  opacity: 0.3;
+}
+
+.empty-state h3 {
+  font-size: var(--font-lg);
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 1200px) {
+  .main-content {
+    flex-direction: column;
+  }
+  
+  .sidebar,
+  .tuner-section {
+    width: 100%;
+    border-right: none;
+    border-left: none;
+  }
+  
+  .sidebar {
+    border-bottom: 1px solid var(--border-soft);
+  }
+  
+  .tuner-section {
+    border-top: 1px solid var(--border-soft);
+  }
+  
+  .snapshot-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .header-content {
+    flex-direction: column;
+    height: auto;
+    padding: 16px;
+    gap: 16px;
+  }
+  
+  .header-actions {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .comparison-grid {
+    flex-direction: column;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  
+  .comparison-actions {
+    margin-left: 0;
+    width: 100%;
+  }
+  
+  .toast-container {
+    left: 20px;
+    right: 20px;
+  }
+  
+  .toast {
+    min-width: auto;
+  }
+  
+  .preview-modal-content,
+  .save-modal-content {
+    max-width: 95%;
+    padding: 20px;
+  }
+}
+    </style>
+</head>
+<body>
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <a href="{% url 'project_list' %}" class="navbar-brand">
+                    <div class="brand-icon">
+                        <img src="{% static 'images/logo.png' %}" alt="TankTuner Logo" style="width: 42px; height: 42px;">
+                    </div>
+                    <div class="brand-text">
+                        <h1>TankTuner</h1>
+                        <div class="brand-subtitle">{{ project.name }}</div>
+                    </div>
+                </a>
+                <div class="header-actions">
+                    <button id="exportModelBtn" class="btn btn-secondary" disabled>
+                        <i class="fas fa-download"></i> Export CSV
+                    </button>
+                    <button id="exportComparisonBtn" class="btn btn-info" disabled>
+                        <i class="fas fa-chart-bar"></i> Comparison
+                    </button>
+                    <button id="saveSnapshotBtn" class="btn btn-success" disabled>
+                        <i class="fas fa-save"></i> Save State
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Left Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <div class="sidebar-label">Configuration</div>
+                    <div class="form-group">
+                        <label class="form-label">Product Type</label>
+                        <select id="productSelect" class="form-select" disabled>
+                            <option value="">Loading products...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Tank Model</label>
+                        <select id="modelSelect" class="form-select" disabled>
+                            <option value="">Select product first</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div style="margin-top: auto;">
+                    <button id="viewSnapshotsBtn" class="btn btn-primary w-full" style="margin-bottom: 16px;" disabled>
+                        <i class="fas fa-history"></i> View Saved Snapshots
+                    </button>
+                    <div style="padding: 16px; background: var(--bg-muted); border-radius: var(--radius-md);">
+                        <div style="display: flex; align-items: center; gap: 8px; font-size: var(--font-xs); color: var(--text-muted); margin-bottom: 8px;">
+                            <i class="fas fa-history"></i>
+                            <span>Last edited: Just now</span>
+                        </div>
+                        <div style="font-size: var(--font-xs); color: var(--text-muted);">
+                            User: {{ user.username|default:"Admin" }}
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Workspace -->
+            <main class="workspace">
+                <div class="workspace-header">
+                    <div class="breadcrumbs">
+                        <span id="currentProductLabel">Select Product</span> <span>/</span> <span id="currentModelLabel">Model Selection</span>
+                    </div>
+                    <h2 class="workspace-title">Cost Tuner Workspace</h2>
+                    <p class="workspace-subtitle">Adjust rates and quantities to optimize manufacturing costs</p>
+                    <div class="workspace-actions">
+                        <button id="resetAllButton" class="btn btn-secondary"  disabled>
+                            <i class="fas fa-redo"></i> Reset All
+                        </button>
+                    </div>
+                </div>
+
+                <div id="materialsTableContainer">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-box-open"></i>
+                        </div>
+                        <h3>No Model Selected</h3>
+                        <p>Select a product and model to view material breakdown</p>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Right Sidebar (Tuner Panel) -->
+            <aside class="tuner-section">
+                <div id="tunerPanel" class="tuner-panel">
+                    <div class="tuner-header">
+                        <h3 id="tunerMaterialName" class="tuner-material-name">Select Material</h3>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            <span>Quantity</span>
+                            <span class="toggle-group">
+                                <input type="checkbox" id="lockQtyToggle">
+                                <span>Lock</span>
+                            </span>
+                        </label>
+                        <input type="number" id="quantityInput" class="form-input" step="any" min="0" disabled>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            <span>Rate (₹)</span>
+                            <span class="toggle-group">
+                                <input type="checkbox" id="lockRateToggle">
+                                <span>Lock</span>
+                            </span>
+                        </label>
+                        <input type="number" id="rateInput" class="form-input" step="any" min="0" disabled>
+                    </div>
+
+                    <div class="cost-display">
+                        <div class="cost-label">Material Cost</div>
+                        <div class="cost-value">₹ <span id="tunerTotalCost">0.00</span></div>
+                    </div>
+
+                    <button id="resetButton" class="btn btn-secondary w-full" disabled>
+                        <i class="fas fa-redo"></i> Reset to Original
+                    </button>
+                </div>
+            </aside>
+        </div>
+
+        <!-- Comparison Panel -->
+        <section id="comparisonPanel" class="comparison-panel hidden">
+            <div class="comparison-grid">
+                <div class="comparison-card">
+                    <div class="comparison-label">Original Cost</div>
+                    <div id="originalCost" class="comparison-value line-through">₹ 0.00</div>
+                </div>
+                
+                <div class="comparison-card">
+                    <div class="comparison-label" style="color: var(--primary);">Optimized Cost</div>
+                    <div id="optimizedCost" class="comparison-value">₹ 0.00</div>
+                </div>
+                
+                <div class="savings-badge" id="differenceCard">
+                    <div class="savings-label" id="differenceLabel">Savings</div>
+                    <div id="costDifference" class="savings-value">₹ 0.00</div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- 🎯 NEW: Preview Modal (STEP 1) -->
+    <div id="previewModal" class="preview-modal hidden">
+        <div class="preview-modal-content">
+            <h3><i class="fas fa-chart-line" style="color: var(--primary);"></i> Snapshot Preview</h3>
+            
+            <div class="preview-summary">
+                <div class="preview-summary-row">
+                    <span class="preview-summary-label">Original Cost</span>
+                    <span id="previewOriginalCost" class="preview-summary-value line-through">₹ 0.00</span>
+                </div>
+                <div class="preview-summary-row">
+                    <span class="preview-summary-label">Optimized Cost</span>
+                    <span id="previewOptimizedCost" class="preview-summary-value">₹ 0.00</span>
+                </div>
+                
+                <div id="previewDifferenceCard" class="preview-difference-card">
+                    <div id="previewDifferenceLabel" class="preview-difference-label">
+                        <i class="fas fa-arrow-down"></i> Savings
+                    </div>
+                    <div id="previewDifferenceValue" class="preview-difference-value">₹ 0.00</div>
+                </div>
+            </div>
+
+            <div class="preview-changes-section">
+                <div class="preview-changes-header">
+                    <i class="fas fa-edit"></i> Changed Materials (<span id="previewChangedCount">0</span>)
+                </div>
+                <div id="previewChangesList" class="preview-changes-list">
+                    <!-- Changes will be populated here -->
+                </div>
+            </div>
+
+            <div class="preview-modal-actions">
+                <button onclick="hidePreviewModal()" class="btn btn-secondary">Cancel</button>
+                <button onclick="proceedToSave()" class="btn btn-success">
+                    <i class="fas fa-arrow-right"></i> Continue
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Save Modal (STEP 2 - Existing) -->
+    <div id="saveModal" class="save-modal hidden">
+        <div class="save-modal-content">
+            <h3><i class="fas fa-save" style="color: var(--primary);"></i> Save Current State</h3>
+            <textarea id="snapshotNotes" placeholder="Add optional notes about this snapshot (e.g., 'Reduced steel thickness', 'Optimized material rates')..."></textarea>
+            <div class="save-modal-actions">
+                <button onclick="hideSaveModal()" class="btn btn-secondary">Cancel</button>
+                <button onclick="saveSnapshot()" class="btn btn-success">Save Snapshot</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Snapshots Viewer -->
+    <div id="snapshotsViewer" class="snapshots-viewer hidden">
+        <div class="snapshots-content">
+            <div class="snapshots-header">
+                <h2><i class="fas fa-history"></i> Saved Snapshots</h2>
+                <button onclick="hideSnapshotsViewer()" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Close
+                </button>
+            </div>
+            <div class="snapshots-body" id="snapshotsViewerBody">
+                <!-- Snapshots will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toast Notification System
+        const Toast = {
+            show(message, type = 'info') {
+                const container = document.getElementById('toastContainer');
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                
+                let icon = 'ℹ️';
+                if (type === 'success') icon = '✅';
+                if (type === 'error') icon = '❌';
+                if (type === 'warning') icon = '⚠️';
+                
+                toast.innerHTML = `
+                    <div class="toast-icon">${icon}</div>
+                    <div class="toast-message">${message}</div>
+                    <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+                `;
+                
+                container.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.style.animation = 'slideOut 0.3s ease';
+                    setTimeout(() => toast.remove(), 300);
+                }, 4000);
+            }
+        };
+
+        // Application State
+        const AppState = {
+            lockQuantity: false,
+            lockRate: false,
+            materials: [],
+            originalMaterials: [],
+            selectedMaterialIndex: null,
+            currentProduct: '',
+            currentModel: '',
+            isLoading: false,
+            originalSaved: false,
+            projectId: {{ project.id }}
+        };
+
+        // DOM Elements
+        const DOM = {
+            productSelect: document.getElementById('productSelect'),
+            modelSelect: document.getElementById('modelSelect'),
+            tunerPanel: document.getElementById('tunerPanel'),
+            tunerMaterialName: document.getElementById('tunerMaterialName'),
+            quantityInput: document.getElementById('quantityInput'),
+            rateInput: document.getElementById('rateInput'),
+            lockQtyToggle: document.getElementById('lockQtyToggle'),
+            lockRateToggle: document.getElementById('lockRateToggle'),
+            tunerTotalCost: document.getElementById('tunerTotalCost'),
+            resetButton: document.getElementById('resetButton'),
+            materialsTableContainer: document.getElementById('materialsTableContainer'),
+            comparisonPanel: document.getElementById('comparisonPanel'),
+            originalCost: document.getElementById('originalCost'),
+            optimizedCost: document.getElementById('optimizedCost'),
+            costDifference: document.getElementById('costDifference'),
+            differenceCard: document.getElementById('differenceCard'),
+            differenceLabel: document.getElementById('differenceLabel'),
+            exportModelBtn: document.getElementById('exportModelBtn'),
+            exportComparisonBtn: document.getElementById('exportComparisonBtn'),
+            saveSnapshotBtn: document.getElementById('saveSnapshotBtn'),
+            resetAllButton: document.getElementById('resetAllButton'),
+            saveModal: document.getElementById('saveModal'),
+            snapshotNotes: document.getElementById('snapshotNotes'),
+            currentModelLabel: document.getElementById('currentModelLabel'),
+            currentProductLabel: document.getElementById('currentProductLabel'),
+            viewSnapshotsBtn: document.getElementById('viewSnapshotsBtn'),
+            snapshotsViewer: document.getElementById('snapshotsViewer'),
+            snapshotsViewerBody: document.getElementById('snapshotsViewerBody'),
+            // 🎯 NEW: Preview Modal Elements
+            previewModal: document.getElementById('previewModal'),
+            previewOriginalCost: document.getElementById('previewOriginalCost'),
+            previewOptimizedCost: document.getElementById('previewOptimizedCost'),
+            previewDifferenceCard: document.getElementById('previewDifferenceCard'),
+            previewDifferenceLabel: document.getElementById('previewDifferenceLabel'),
+            previewDifferenceValue: document.getElementById('previewDifferenceValue'),
+            previewChangedCount: document.getElementById('previewChangedCount'),
+            previewChangesList: document.getElementById('previewChangesList')
+        };
+
+        // Utility Functions
+        const Utils = {
+            formatCurrency(value) {
+                return parseFloat(value).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            },
+
+            calculateTotalCost(materials) {
+                return materials.reduce((sum, material) => sum + material.total, 0);
+            },
+
+            debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            },
+
+            getCSRFToken() {
+                const name = 'csrftoken';
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            },
+
+            // 🎯 NEW: Calculate Changed Materials
+            getChangedMaterials(originalMaterials, currentMaterials) {
+                const changes = [];
+                
+                for (let i = 0; i < originalMaterials.length; i++) {
+                    const original = originalMaterials[i];
+                    const current = currentMaterials[i];
+                    
+                    if (!original || !current) continue;
+                    
+                    const qtyChanged = Math.abs(original.quantity - current.quantity) > 0.001;
+                    const rateChanged = Math.abs(original.rate - current.rate) > 0.001;
+                    
+                    if (qtyChanged || rateChanged) {
+                        changes.push({
+                            name: original.name,
+                            original: {
+                                quantity: original.quantity,
+                                rate: original.rate,
+                                total: original.total
+                            },
+                            current: {
+                                quantity: current.quantity,
+                                rate: current.rate,
+                                total: current.total
+                            },
+                            qtyChanged,
+                            rateChanged
+                        });
+                    }
+                }
+                
+                return changes;
+            }
+        };
+
+        // API Service
+        const APIService = {
+            async fetchProducts() {
+                const response = await fetch(`/api/project/${AppState.projectId}/products/`);
+                if (!response.ok) throw new Error('Failed to fetch products');
+                return await response.json();
+            },
+
+            async fetchModels(product) {
+                const response = await fetch(`/api/project/${AppState.projectId}/models/?product=${encodeURIComponent(product)}`);
+                if (!response.ok) throw new Error('Failed to fetch models');
+                return await response.json();
+            },
+
+            async fetchModelData(product, model) {
+                const response = await fetch(
+                    `/api/project/${AppState.projectId}/model-data/?product=${encodeURIComponent(product)}&model=${encodeURIComponent(model)}`
+                );
+                if (!response.ok) throw new Error('Failed to fetch model data');
+                return await response.json();
+            },
+
+            async exportModelCSV(data) {
+                const response = await fetch('/export/model/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': Utils.getCSRFToken()
+                    },
+                    body: JSON.stringify(data)
+                });
+                if (!response.ok) throw new Error('Export failed');
+                return await response.blob();
+            },
+
+            async exportComparisonCSV(data) {
+                const response = await fetch('/export/comparison/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': Utils.getCSRFToken()
+                    },
+                    body: JSON.stringify(data)
+                });
+                if (!response.ok) throw new Error('Export failed');
+                return await response.blob();
+            },
+
+            async fetchSavedSnapshots(product, model) {
+                const response = await fetch(`/api/project/${AppState.projectId}/saved-models/?product=${encodeURIComponent(product)}&model=${encodeURIComponent(model)}`);
+                if (!response.ok) throw new Error('Failed to fetch snapshots');
+                return await response.json();
+            },
+
+            async saveSnapshot(data) {
+                const response = await fetch(`/api/project/${AppState.projectId}/save-snapshot/`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": Utils.getCSRFToken()
+                    },
+                    body: JSON.stringify(data)
+                });
+                if (!response.ok) throw new Error('Failed to save snapshot');
+                return await response.json();
+            },
+
+            async loadSnapshot(snapshotId) {
+                const response = await fetch(`/api/load-snapshot/${snapshotId}/`);
+                if (!response.ok) throw new Error('Failed to load snapshot');
+                return await response.json();
+            },
+
+            async deleteSnapshot(snapshotId) {
+                const response = await fetch(`/api/delete-snapshot/${snapshotId}/`, {
+                    method: "POST",
+                    headers: {
+                        'X-CSRFToken': Utils.getCSRFToken()
+                    }
+                });
+                if (!response.ok) throw new Error('Failed to delete snapshot');
+                return await response.json();
+            }
+        };
+
+        // UI Renderer
+        const UIRenderer = {
+            renderMaterialsTable(materials) {
+                if (!materials || materials.length === 0) {
+                    DOM.materialsTableContainer.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon"><i class="fas fa-box-open"></i></div>
+                            <h3>No Materials Found</h3>
+                            <p>No materials data available for this model</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const totalCost = Utils.calculateTotalCost(materials);
+                
+                let tableHTML = `
+                    <div class="table-container">
+                        <table class="materials-table">
+                            <thead>
+                                <tr>
+                                    <th>Material Name</th>
+                                    <th>Quantity</th>
+                                    <th>Unit</th>
+                                    <th class="text-right">Rate (₹)</th>
+                                    <th class="text-right">Total (₹)</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                materials.forEach((material, index) => {
+                    tableHTML += `
+                        <tr>
+                            <td>
+                                <div class="material-name">${material.name}</div>
+                                <div class="material-spec">Spec: ${material.spec || 'Standard'}</div>
+                            </td>
+                            <td>${material.quantity.toFixed(2)}</td>
+                            <td><span style="font-size: var(--font-xs); font-weight: 600; color: var(--text-muted); text-transform: uppercase;">${material.unit}</span></td>
+                            <td style="text-align: right;">₹ ${material.rate.toFixed(2)}</td>
+                            <td class="cost-cell">₹ ${material.total.toFixed(2)}</td>
+                            <td>
+                                <button onclick="AppController.selectMaterial(${index})" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-sliders-h"></i> Adjust
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                tableHTML += `
+                            </tbody>
+                            <tfoot>
+                                <tr class="table-total">
+                                    <td colspan="4" style="text-align: right; font-size: var(--font-sm); font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Calculated Total</td>
+                                    <td class="cost-cell">₹ ${Utils.formatCurrency(totalCost)}</td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                `;
+
+                DOM.materialsTableContainer.innerHTML = tableHTML;
+            },
+
+            updateComparison(originalMaterials, currentMaterials) {
+                const originalTotal = Utils.calculateTotalCost(originalMaterials);
+                const currentTotal = Utils.calculateTotalCost(currentMaterials);
+                const difference = currentTotal - originalTotal;
+                const isSavings = difference <= 0;
+
+                DOM.originalCost.textContent = `₹ ${Utils.formatCurrency(originalTotal)}`;
+                DOM.optimizedCost.textContent = `₹ ${Utils.formatCurrency(currentTotal)}`;
+                DOM.costDifference.textContent = `₹ ${Utils.formatCurrency(Math.abs(difference))}`;
+
+                if (isSavings) {
+                    DOM.differenceCard.className = 'savings-badge';
+                    DOM.differenceLabel.innerHTML = '<i class="fas fa-check-circle"></i> Savings';
+                    DOM.differenceLabel.style.color = 'var(--success)';
+                } else {
+                    DOM.differenceCard.className = 'savings-badge';
+                    DOM.differenceLabel.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Increase';
+                    DOM.differenceLabel.style.color = 'var(--danger)';
+                    DOM.differenceCard.style.background = 'rgba(220, 38, 38, 0.1)';
+                    DOM.differenceCard.style.borderColor = 'rgba(220, 38, 38, 0.2)';
+                    DOM.costDifference.style.color = 'var(--danger)';
+                }
+
+                DOM.comparisonPanel.classList.remove('hidden');
+            },
+
+            updateTunerPanel(material) {
+                if (!material) {
+                    DOM.tunerPanel.style.opacity = '0.5';
+                    return;
+                }
+
+                DOM.tunerMaterialName.textContent = material.name;
+                DOM.quantityInput.value = material.quantity;
+                DOM.rateInput.value = material.rate;
+                DOM.tunerTotalCost.textContent = Utils.formatCurrency(material.total);
+
+                DOM.quantityInput.disabled = AppState.lockQuantity;
+                DOM.rateInput.disabled = AppState.lockRate;
+
+                DOM.tunerPanel.style.opacity = '1';
+                DOM.resetButton.disabled = false;
+            },
+
+            // 🎯 NEW: Show Preview Modal
+            showPreviewModal() {
+                const originalTotal = Utils.calculateTotalCost(AppState.originalMaterials);
+                const currentTotal = Utils.calculateTotalCost(AppState.materials);
+                const difference = currentTotal - originalTotal;
+                const percentage = ((difference / originalTotal) * 100).toFixed(1);
+                const isSavings = difference < 0;
+
+                // Update summary values
+                DOM.previewOriginalCost.textContent = `₹ ${Utils.formatCurrency(originalTotal)}`;
+                DOM.previewOptimizedCost.textContent = `₹ ${Utils.formatCurrency(currentTotal)}`;
+                DOM.previewDifferenceValue.textContent = `₹ ${Utils.formatCurrency(Math.abs(difference))} (${Math.abs(percentage)}%)`;
+
+                // Update difference card styling
+                if (isSavings) {
+                    DOM.previewDifferenceCard.classList.remove('increase');
+                    DOM.previewDifferenceLabel.innerHTML = '<i class="fas fa-arrow-down"></i> Savings';
+                } else {
+                    DOM.previewDifferenceCard.classList.add('increase');
+                    DOM.previewDifferenceLabel.innerHTML = '<i class="fas fa-arrow-up"></i> Cost Increase';
+                }
+
+                // Get changed materials
+                const changes = Utils.getChangedMaterials(AppState.originalMaterials, AppState.materials);
+                DOM.previewChangedCount.textContent = changes.length;
+
+                // Render changes list
+                if (changes.length === 0) {
+                    DOM.previewChangesList.innerHTML = `
+                        <div class="preview-no-changes">
+                            <div class="preview-no-changes-icon">
+                                <i class="fas fa-equals"></i>
+                            </div>
+                            <p>No materials were changed</p>
+                        </div>
+                    `;
+                } else {
+                    let changesHTML = '';
+                    changes.forEach(change => {
+                        changesHTML += `
+                            <div class="preview-change-item">
+                                <div class="preview-change-name">${change.name}</div>
+                                ${change.qtyChanged ? `
+                                    <div class="preview-change-detail">
+                                        <span>Qty:</span>
+                                        <span>${change.original.quantity.toFixed(2)}</span>
+                                        <span class="preview-change-arrow">→</span>
+                                        <span>${change.current.quantity.toFixed(2)}</span>
+                                    </div>
+                                ` : ''}
+                                ${change.rateChanged ? `
+                                    <div class="preview-change-detail">
+                                        <span>Rate:</span>
+                                        <span>₹${change.original.rate.toFixed(2)}</span>
+                                        <span class="preview-change-arrow">→</span>
+                                        <span>₹${change.current.rate.toFixed(2)}</span>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `;
+                    });
+                    DOM.previewChangesList.innerHTML = changesHTML;
+                }
+
+                DOM.previewModal.classList.remove('hidden');
+            },
+
+            hidePreviewModal() {
+                DOM.previewModal.classList.add('hidden');
+            },
+
+            showSaveModal() {
+                DOM.snapshotNotes.value = '';
+                DOM.saveModal.classList.remove('hidden');
+            },
+
+            hideSaveModal() {
+                DOM.saveModal.classList.add('hidden');
+            },
+
+            async renderSnapshotsViewer(snapshots) {
+                if (!snapshots || snapshots.length === 0) {
+                    DOM.snapshotsViewerBody.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon"><i class="fas fa-history"></i></div>
+                            <h3>No Saved Snapshots</h3>
+                            <p>Make adjustments and save them to see your optimization history</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = '<div class="snapshot-grid">';
+                
+                for (const snap of snapshots) {
+                    const badgeClass = snap.is_original ? 'badge-original' : 'badge-modified';
+                    const badgeText = snap.is_original ? 'ORIGINAL' : 'MODIFIED';
+                    
+                    let savingsHtml = '';
+                    if (!snap.is_original) {
+                        const original = snapshots.find(s => s.is_original);
+                        if (original) {
+                            const savings = original.final_cost - snap.final_cost;
+                            const percentage = ((savings / original.final_cost) * 100).toFixed(1);
+                            const isSavings = savings > 0;
+                            
+                            savingsHtml = `
+                                <div class="stat-item">
+                                    <div class="stat-item-label">Savings</div>
+                                    <div class="stat-item-value ${isSavings ? 'savings' : ''}">
+                                        ${isSavings ? '-' : '+'}₹${Math.abs(savings).toFixed(2)} (${isSavings ? '-' : '+'}${percentage}%)
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    }
+                    
+                    html += `
+                        <div class="snapshot-card" onclick="AppController.loadSnapshotFromViewer(${snap.id})">
+                            <div class="snapshot-card-header">
+                                <div class="snapshot-badge ${badgeClass}">${badgeText}</div>
+                            </div>
+                            <div class="snapshot-info">
+                                <h3>${AppState.currentModel}</h3>
+                                <div class="snapshot-meta">
+                                    <i class="far fa-clock"></i> ${snap.saved_at}
+                                </div>
+                            </div>
+                            <div class="snapshot-notes">
+                                ${snap.notes || '<em style="color: var(--text-light);">No notes added</em>'}
+                            </div>
+                            <div class="snapshot-stats">
+                                <div class="stat-item">
+                                    <div class="stat-item-label">Total Cost</div>
+                                    <div class="stat-item-value">₹${snap.final_cost.toFixed(2)}</div>
+                                </div>
+                                ${savingsHtml}
+                            </div>
+                            <div class="snapshot-actions">
+                                <button onclick="event.stopPropagation(); AppController.loadSnapshotFromViewer(${snap.id})" class="btn btn-primary btn-sm w-full">
+                                    <i class="fas fa-folder-open"></i> Load
+                                </button>
+                                ${!snap.is_original ? `
+                                    <button onclick="event.stopPropagation(); AppController.deleteSnapshotFromViewer(${snap.id})" class="btn btn-secondary btn-sm">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                html += '</div>';
+                DOM.snapshotsViewerBody.innerHTML = html;
+            }
+        };
+
+        // Application Controller
+        const AppController = {
+            async initialize() {
+                this.setupEventListeners();
+                await this.loadProducts();
+
+                const snapshotToLoad = localStorage.getItem('loadSnapshotOnOpen');
+                if (snapshotToLoad) {
+                    localStorage.removeItem('loadSnapshotOnOpen');
+                    await this.autoLoadSnapshot(parseInt(snapshotToLoad));
+                }
+            },
+
+            setupEventListeners() {
+                DOM.productSelect.addEventListener('change', (e) => {
+                    AppState.currentProduct = e.target.value;
+                    DOM.currentProductLabel.textContent = e.target.value || 'Select Product';
+                    this.loadModels(e.target.value);
+                });
+
+                DOM.modelSelect.addEventListener('change', async (e) => {
+                    AppState.currentModel = e.target.value;
+                    DOM.currentModelLabel.textContent = e.target.value || 'Model Selection';
+                    if (AppState.currentProduct && e.target.value) {
+                        await this.loadModelData(AppState.currentProduct, e.target.value);
+                    }
+                });
+
+                DOM.lockQtyToggle.addEventListener('change', (e) => {
+                    AppState.lockQuantity = e.target.checked;
+                    DOM.quantityInput.disabled = AppState.lockQuantity;
+                });
+
+                DOM.lockRateToggle.addEventListener('change', (e) => {
+                    AppState.lockRate = e.target.checked;
+                    DOM.rateInput.disabled = AppState.lockRate;
+                });
+
+                const debouncedUpdate = Utils.debounce(() => this.updateMaterial(), 300);
+                DOM.quantityInput.addEventListener('input', debouncedUpdate);
+                DOM.rateInput.addEventListener('input', debouncedUpdate);
+
+                DOM.resetButton.addEventListener('click', () => this.resetToOriginal());
+                DOM.exportModelBtn.addEventListener('click', () => this.exportModel());
+                DOM.exportComparisonBtn.addEventListener('click', () => this.exportComparison());
+                
+                // 🎯 MODIFIED: Save button now shows preview first
+                DOM.saveSnapshotBtn.addEventListener('click', () => this.showSavePreview());
+                
+                DOM.resetAllButton.addEventListener('click', () => this.resetToOriginal());
+                DOM.viewSnapshotsBtn.addEventListener('click', () => this.showSnapshotsViewer());
+            },
+
+            async autoLoadSnapshot(snapshotId) {
+                try {
+                    Toast.show('Loading snapshot...', 'info');
+
+                    const data = await APIService.loadSnapshot(snapshotId);
+
+                    AppState.currentProduct = data.product;
+                    AppState.currentModel = data.model;
+
+                    DOM.productSelect.value = data.product;
+                    DOM.currentProductLabel.textContent = data.product;
+
+                    await this.loadModels(data.product);
+
+                    DOM.modelSelect.value = data.model;
+                    DOM.currentModelLabel.textContent = data.model;
+
+                    AppState.materials = JSON.parse(JSON.stringify(data.materials));
+
+                    if (data.is_original) {
+                        AppState.originalMaterials = JSON.parse(JSON.stringify(data.materials));
+                    } else {
+                        const originalData = await APIService.fetchModelData(data.product, data.model);
+                        AppState.originalMaterials = JSON.parse(JSON.stringify(originalData.materials));
+                    }
+
+                    AppState.selectedMaterialIndex = null;
+
+                    UIRenderer.renderMaterialsTable(AppState.materials);
+                    UIRenderer.updateComparison(AppState.originalMaterials, AppState.materials);
+                    UIRenderer.updateTunerPanel(null);
+
+                    DOM.exportModelBtn.disabled = false;
+                    DOM.exportComparisonBtn.disabled = false;
+                    DOM.saveSnapshotBtn.disabled = false;
+                    DOM.resetAllButton.disabled = false;
+                    DOM.viewSnapshotsBtn.disabled = false;
+
+                    Toast.show('Snapshot loaded successfully!', 'success');
+
+                } catch (error) {
+                    console.error('Auto-load snapshot error:', error);
+                    Toast.show('Failed to load snapshot', 'error');
+                }
+            },
+
+            async loadProducts() {
+                try {
+                    const data = await APIService.fetchProducts();
+                    
+                    DOM.productSelect.innerHTML = '<option value="">Select Product</option>';
+                    if (data.products && data.products.length > 0) {
+                        data.products.forEach(product => {
+                            DOM.productSelect.innerHTML += `<option value="${product}">${product}</option>`;
+                        });
+                        DOM.productSelect.disabled = false;
+                    }
+                } catch (error) {
+                    Toast.show('Failed to load products', 'error');
+                }
+            },
+
+            async loadModels(product) {
+                if (!product) return;
+
+                try {
+                    const data = await APIService.fetchModels(product);
+                    
+                    DOM.modelSelect.innerHTML = '<option value="">Select Model</option>';
+                    if (data.models && data.models.length > 0) {
+                        data.models.forEach(model => {
+                            DOM.modelSelect.innerHTML += `<option value="${model}">${model}</option>`;
+                        });
+                        DOM.modelSelect.disabled = false;
+                    }
+                } catch (error) {
+                    Toast.show('Failed to load models', 'error');
+                }
+            },
+
+            async loadModelData(product, model) {
+                try {
+                    const data = await APIService.fetchModelData(product, model);
+                    
+                    AppState.materials = JSON.parse(JSON.stringify(data.materials));
+                    AppState.originalMaterials = JSON.parse(JSON.stringify(data.materials));
+                    AppState.selectedMaterialIndex = null;
+
+                    UIRenderer.renderMaterialsTable(AppState.materials);
+                    UIRenderer.updateComparison(AppState.originalMaterials, AppState.materials);
+                    UIRenderer.updateTunerPanel(null);
+                    
+                    DOM.exportModelBtn.disabled = false;
+                    DOM.exportComparisonBtn.disabled = false;
+                    DOM.saveSnapshotBtn.disabled = false;
+                    DOM.resetAllButton.disabled = false;
+                    DOM.viewSnapshotsBtn.disabled = false;
+                    
+                    Toast.show('Model loaded successfully!', 'success');
+                } catch (error) {
+                    Toast.show('Failed to load model data', 'error');
+                }
+            },
+
+            async showSnapshotsViewer() {
+                if (!AppState.currentProduct || !AppState.currentModel) {
+                    Toast.show('Please select a model first', 'warning');
+                    return;
+                }
+                
+                try {
+                    const data = await APIService.fetchSavedSnapshots(AppState.currentProduct, AppState.currentModel);
+                    await UIRenderer.renderSnapshotsViewer(data.snapshots || []);
+                    DOM.snapshotsViewer.classList.remove('hidden');
+                } catch (error) {
+                    Toast.show('Failed to load snapshots', 'error');
+                }
+            },
+
+            async loadSnapshotFromViewer(snapshotId) {
+                try {
+                    const data = await APIService.loadSnapshot(snapshotId);
+                    
+                    AppState.materials = JSON.parse(JSON.stringify(data.materials));
+                    
+                    if (data.is_original) {
+                        AppState.originalMaterials = JSON.parse(JSON.stringify(data.materials));
+                    }
+                    
+                    AppState.selectedMaterialIndex = null;
+                    
+                    UIRenderer.renderMaterialsTable(AppState.materials);
+                    UIRenderer.updateComparison(AppState.originalMaterials, AppState.materials);
+                    UIRenderer.updateTunerPanel(null);
+                    
+                    DOM.snapshotsViewer.classList.add('hidden');
+                    Toast.show('Snapshot loaded successfully!', 'success');
+                } catch (error) {
+                    Toast.show('Failed to load snapshot', 'error');
+                }
+            },
+
+            async deleteSnapshotFromViewer(snapshotId) {
+                if (!confirm("Delete this snapshot? This cannot be undone.")) {
+                    return;
+                }
+                
+                try {
+                    await APIService.deleteSnapshot(snapshotId);
+                    Toast.show('Snapshot deleted successfully', 'success');
+                    await this.showSnapshotsViewer();
+                } catch (error) {
+                    Toast.show('Failed to delete snapshot', 'error');
+                }
+            },
+
+            async saveSnapshot() {
+                if (!AppState.currentProduct || !AppState.currentModel || AppState.materials.length === 0) {
+                    Toast.show('Please select a model first', 'warning');
+                    return;
+                }
+
+                try {
+                    const finalCost = Utils.calculateTotalCost(AppState.materials);
+                    
+                    const data = await APIService.saveSnapshot({
+                        product: AppState.currentProduct,
+                        model: AppState.currentModel,
+                        materials: AppState.materials,
+                        final_cost: finalCost,
+                        notes: DOM.snapshotNotes.value,
+                        is_original: false
+                    });
+                    
+                    if (data.success) {
+                        Toast.show('Snapshot saved successfully!', 'success');
+                        UIRenderer.hideSaveModal();
+                    }
+                } catch (error) {
+                    Toast.show('Failed to save snapshot', 'error');
+                }
+            },
+
+            // 🎯 NEW: Show preview modal first (STEP 1)
+            showSavePreview() {
+                if (!AppState.currentProduct || !AppState.currentModel || AppState.materials.length === 0) {
+                    Toast.show('Please select a model first', 'warning');
+                    return;
+                }
+                UIRenderer.showPreviewModal();
+            },
+
+            selectMaterial(index) {
+                AppState.selectedMaterialIndex = index;
+                const material = AppState.materials[index];
+                
+                AppState.lockQuantity = false;
+                AppState.lockRate = false;
+                DOM.lockQtyToggle.checked = false;
+                DOM.lockRateToggle.checked = false;
+                
+                UIRenderer.updateTunerPanel(material);
+            },
+
+            updateMaterial() {
+                if (AppState.selectedMaterialIndex === null) return;
+
+                const material = AppState.materials[AppState.selectedMaterialIndex];
+                
+                if (!AppState.lockQuantity) {
+                    material.quantity = parseFloat(DOM.quantityInput.value) || 0;
+                }
+                
+                if (!AppState.lockRate) {
+                    material.rate = parseFloat(DOM.rateInput.value) || 0;
+                }
+                
+                material.total = material.quantity * material.rate;
+                
+                UIRenderer.updateTunerPanel(material);
+                UIRenderer.renderMaterialsTable(AppState.materials);
+                UIRenderer.updateComparison(AppState.originalMaterials, AppState.materials);
+            },
+
+            resetToOriginal() {
+                AppState.materials = JSON.parse(JSON.stringify(AppState.originalMaterials));
+                AppState.selectedMaterialIndex = null;
+                
+                AppState.lockQuantity = false;
+                AppState.lockRate = false;
+                DOM.lockQtyToggle.checked = false;
+                DOM.lockRateToggle.checked = false;
+                
+                UIRenderer.renderMaterialsTable(AppState.materials);
+                UIRenderer.updateComparison(AppState.originalMaterials, AppState.materials);
+                UIRenderer.updateTunerPanel(null);
+                
+                Toast.show('Reset to original values', 'info');
+            },
+
+            async exportModel() {
+                if (!AppState.currentProduct || !AppState.currentModel || AppState.materials.length === 0) {
+                    Toast.show('Please select a model first', 'warning');
+                    return;
+                }
+
+                try {
+                    const finalCost = Utils.calculateTotalCost(AppState.materials);
+                    
+                    const blob = await APIService.exportModelCSV({
+                        product: AppState.currentProduct,
+                        model: AppState.currentModel,
+                        materials: AppState.materials,
+                        final_cost: finalCost
+                    });
+                    
+                    this.downloadFile(blob, `${AppState.currentModel}_costing.csv`);
+                    Toast.show('CSV exported successfully!', 'success');
+                } catch (error) {
+                    Toast.show('Export failed', 'error');
+                }
+            },
+
+            async exportComparison() {
+                if (!AppState.currentProduct || !AppState.currentModel || AppState.materials.length === 0) {
+                    Toast.show('Please select a model first', 'warning');
+                    return;
+                }
+
+                try {
+                    const originalCost = Utils.calculateTotalCost(AppState.originalMaterials);
+                    const currentCost = Utils.calculateTotalCost(AppState.materials);
+                    
+                    const blob = await APIService.exportComparisonCSV({
+                        product: AppState.currentProduct,
+                        model: AppState.currentModel,
+                        original_materials: AppState.originalMaterials,
+                        current_materials: AppState.materials,
+                        original_cost: originalCost,
+                        current_cost: currentCost
+                    });
+                    
+                    this.downloadFile(blob, `${AppState.currentModel}_comparison.csv`);
+                    Toast.show('Comparison exported successfully!', 'success');
+                } catch (error) {
+                    Toast.show('Export failed', 'error');
+                }
+            },
+
+            downloadFile(blob, filename) {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            }
+        };
+
+        // 🎯 NEW: Global Functions for Preview Modal
+        window.hidePreviewModal = () => UIRenderer.hidePreviewModal();
+        window.proceedToSave = () => {
+            UIRenderer.hidePreviewModal();
+            UIRenderer.showSaveModal();
+        };
+
+        // Existing Global Functions
+        window.saveSnapshot = () => AppController.saveSnapshot();
+        window.hideSaveModal = () => UIRenderer.hideSaveModal();
+        window.hideSnapshotsViewer = () => DOM.snapshotsViewer.classList.add('hidden');
+        window.AppController = AppController;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            AppController.initialize();
+        });
+    </script>
+</body>
+</html>

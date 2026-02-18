@@ -1,0 +1,463 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}TankTuner{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <style>
+        /* ========== GLOBAL RESET ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #144bb8;
+            --primary-dark: #0d3a8c;
+            --primary-light: rgba(20, 75, 184, 0.08);
+            --success: #22c55e;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --bg-app: #f6f6f8;
+            --border-soft: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.07);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg-app);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* ========== NAVBAR STYLES ========== */
+        .navbar {
+            background: white;
+            border-bottom: 1px solid var(--border-soft);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .navbar-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+        }
+
+        /* Brand Section */
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: opacity 0.2s;
+        }
+
+        .navbar-brand:hover {
+            opacity: 0.8;
+        }
+
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+            transition: transform 0.2s;
+        }
+
+        .navbar-brand:hover .brand-icon {
+            transform: scale(1.05);
+        }
+
+        .brand-text h1 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .brand-text p {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        /* Navigation Links */
+        .navbar-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .nav-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .nav-link:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .nav-link.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-link .material-icons {
+            font-size: 20px;
+        }
+
+        /* Navbar Actions (Right Side) */
+        .navbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Search Button (Placeholder) */
+        .search-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 1px solid var(--border-soft);
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-muted);
+        }
+
+        .search-btn:hover {
+            background: var(--bg-app);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        /* User Profile */
+        .user-profile {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            border: 2px solid var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+            color: var(--primary);
+        }
+
+        .user-profile:hover {
+            transform: scale(1.05);
+        }
+
+        /* Action Buttons */
+        .btn-nav {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-nav-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 2px 8px rgba(20, 75, 184, 0.2);
+        }
+
+        .btn-nav-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(20, 75, 184, 0.3);
+        }
+
+        .btn-nav-secondary {
+            background: white;
+            color: var(--primary);
+            border: 1px solid var(--border-soft);
+        }
+
+        .btn-nav-secondary:hover {
+            background: var(--bg-app);
+        }
+
+        /* ========== MAIN CONTENT AREA ========== */
+        .main-content {
+            min-height: calc(100vh - 70px);
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 1024px) {
+            .navbar-nav {
+                gap: 4px;
+            }
+
+            .nav-link {
+                padding: 8px 14px;
+                font-size: 13px;
+            }
+
+            .brand-text h1 {
+                font-size: 18px;
+            }
+
+            .brand-text p {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar-container {
+                padding: 0 16px;
+                height: auto;
+                flex-wrap: wrap;
+                padding-top: 12px;
+                padding-bottom: 12px;
+            }
+
+            .navbar-nav {
+                order: 3;
+                width: 100%;
+                margin-top: 12px;
+                justify-content: flex-start;
+                gap: 6px;
+                overflow-x: auto;
+                padding-bottom: 8px;
+            }
+
+            .nav-link {
+                white-space: nowrap;
+            }
+
+            .navbar-actions {
+                gap: 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .brand-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 18px;
+            }
+
+            .brand-text h1 {
+                font-size: 16px;
+            }
+
+            .nav-link span {
+                display: none;
+            }
+
+            .nav-link .material-icons {
+                margin: 0;
+            }
+
+            .btn-nav span {
+                display: none;
+            }
+        }
+
+        /* ========== TOAST NOTIFICATIONS (GLOBAL) ========== */
+        .toast-container {
+            position: fixed;
+            top: 90px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .toast {
+            background: white;
+            border-radius: 10px;
+            padding: 16px 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 300px;
+            max-width: 400px;
+            animation: slideIn 0.3s ease;
+            border-left: 4px solid var(--primary);
+        }
+
+        .toast.success { border-left-color: var(--success); }
+        .toast.error { border-left-color: #dc2626; }
+
+        @keyframes slideIn {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <!-- ========== GLOBAL NAVBAR ========== -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <!-- Brand -->
+            <a href="{% url 'project_list' %}" class="navbar-brand">
+                <div class="brand-icon">
+                    <img src="{% static 'images/logo.png' %}" alt="TankTuner Logo" style="width: 42px; height: 42px;">
+                </div>
+                <div class="brand-text">
+                    <h1>TankTuner</h1>
+                    <p>Cost Optimization Platform</p>
+                </div>
+            </a>
+
+            <!-- Main Navigation -->
+            <div class="navbar-nav">
+                <a href="{% url 'project_list' %}" class="nav-link {% if request.resolver_match.url_name == 'project_list' %}active{% endif %}">
+                    <span class="material-icons">home</span>
+                    <span>Home</span>
+                </a>
+                <a href="{% url 'project_create' %}" class="nav-link {% if request.resolver_match.url_name == 'project_create' %}active{% endif %}">
+                    <span class="material-icons">add_circle</span>
+                    <span>New Project</span>
+                </a>
+                <a href="{% url 'analytics_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'analytics_dashboard' %}active{% endif %}">
+                    <span class="material-icons">insights</span>
+                    <span>Analytics</span>
+                </a>
+            </div>
+
+            <!-- Actions (Right Side) -->
+            <div class="navbar-actions">
+                <!-- Search (Placeholder for Future) -->
+                <button class="search-btn" onclick="alert('Search feature coming soon!')">
+                    <span class="material-icons">search</span>
+                </button>
+
+                <!-- User Profile -->
+                <div class="user-profile" onclick="toggleUserMenu()" style="position: relative; cursor: pointer;" title="{{ user.username }}">
+                    <span class="material-icons">account_circle</span>
+                </div>
+
+                <!-- User Dropdown Menu (Hidden by default) -->
+                <div id="userMenu" style="display: none; position: absolute; top: 65px; right: 24px; background: white; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); min-width: 200px; z-index: 10000;">
+                    <div style="padding: 12px 16px; border-bottom: 1px solid #e2e8f0;">
+                        <div style="font-weight: 600; font-size: 14px;">{{ user.get_full_name|default:user.username }}</div>
+                        <div style="font-size: 12px; color: #64748b;">{{ user.email }}</div>
+                    </div>
+                    <a href="{% url 'logout' %}" style="display: block; padding: 12px 16px; color: #dc2626; text-decoration: none; font-size: 14px; font-weight: 500; transition: background 0.2s;" onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='white'">
+                        <span class="material-icons" style="font-size: 18px; vertical-align: middle; margin-right: 8px;">logout</span>
+                        Sign Out
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ========== TOAST CONTAINER (GLOBAL) ========== -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ========== MAIN CONTENT ========== -->
+    <main class="main-content">
+        {% block content %}
+        <!-- Page content goes here -->
+        {% endblock %}
+    </main>
+
+    <!-- ========== GLOBAL TOAST SCRIPT ========== -->
+    <script>
+
+        function toggleUserMenu() {
+                const menu = document.getElementById('userMenu');
+                menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+            }
+
+            // Close menu when clicking outside
+            document.addEventListener('click', function(event) {
+                const menu = document.getElementById('userMenu');
+                const profile = document.querySelector('.user-profile');
+                if (menu && !menu.contains(event.target) && !profile.contains(event.target)) {
+                    menu.style.display = 'none';
+                }
+            });
+        // Global Toast System (Available on all pages)
+        window.Toast = {
+            show(message, type = 'info') {
+                const container = document.getElementById('toastContainer');
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                
+                let icon = 'ℹ️';
+                if (type === 'success') icon = '✅';
+                if (type === 'error') icon = '❌';
+                if (type === 'warning') icon = '⚠️';
+                
+                toast.innerHTML = `
+                    <div style="font-size: 20px;">${icon}</div>
+                    <div style="flex: 1; font-size: 14px; font-weight: 500;">${message}</div>
+                    <button onclick="this.parentElement.remove()" style="background: none; border: none; cursor: pointer; font-size: 20px; opacity: 0.5;">×</button>
+                `;
+                
+                container.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.style.animation = 'slideOut 0.3s ease';
+                    setTimeout(() => toast.remove(), 300);
+                }, 4000);
+            }
+        };
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
