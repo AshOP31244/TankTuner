@@ -1,0 +1,5 @@
+3.earlier their was no login system now i think i should move to the login system in this project 
+6.also the save state button which help to save the snapshot should open a popup of preview of the changes made and the effect of it then the common popup of description then it gets save 
+7.the search icon should help serach in the databse like an api to get in the database 
+8.in tank tuner tank model option add a feature like along with the dropdown if person types the similar data in that dropdown should be visible 
+9.reset all error (2 noti)

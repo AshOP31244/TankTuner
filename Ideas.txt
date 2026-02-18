@@ -1,0 +1,39 @@
+Core Features to Add:
+✅ Project Management System
+
+Create projects (e.g., "Reliance", "Tata Steel")
+Each project can have multiple costing sheets
+Project dashboard with analytics
+
+
+
+✅ Persistent Storage (Database)
+
+Save adjusted models
+Version history (original vs modified)
+Track who made changes and when
+
+
+
+✅ Export Functionality
+
+Export single model as CSV
+Export comparison report (before/after)
+Export entire project summary
+
+
+
+✅ Enhanced Professional UI
+
+Modern dashboard design
+Project cards layout
+Material cost breakdown charts
+Responsive design
+
+
+
+✅ Additional Features
+
+Search/filter models
+Bulk operations (adjust multiple models)
+Cost trend analysis
