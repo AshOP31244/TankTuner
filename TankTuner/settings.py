@@ -8,8 +8,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
 
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-allowed = os.environ.get('ALLOWED_HOSTS', '')
-ALLOWED_HOSTS = [h.strip() for h in allowed.split(',') if h.strip()] + ['.onrender.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = [h.strip() for h in allowed.split(',') if h.strip()] + ['.railway.app', 'localhost', '127.0.0.1']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -32,7 +31,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com']
+CSRF_TRUSTED_ORIGINS = ['https://*.railway.app', 'https://*.onrender.com']
 
 ROOT_URLCONF = 'TankTuner.urls'
 
